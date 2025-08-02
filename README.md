@@ -1,41 +1,58 @@
-# 🚀 IT Task Manager
-[Click here to visit the service](https://it-task-manager-nws5.onrender.com/)
+# 🚀 IT-task-manager
 
-**IT Task Manager** is a clean, simple, and fully open-source Django-based web application designed to help small startups, indie developers, and teams efficiently manage their projects and tasks.
+## 📝 Description
 
-With an intuitive interface, modern animations, and a sleek GUI, it's easy to use and even easier to modify or extend. Built with maintainability and clarity in mind, the codebase is perfect for both beginners looking to learn Django and developers who need a practical, lightweight task management tool.
+### ❓ Why?
+This project was created to build a practical and elegant task management tool while learning and demonstrating core Django web development skills. It addresses the need for a lightweight, easily extendable, and beginner-friendly platform for managing projects and tasks—especially for small startups, indie developers, and student teams.
 
----
+### ⚙️ How?
 
-## 🌟 Features
+The solution works by combining Django’s robust backend capabilities with a clean and responsive frontend enhanced by modern animations and intuitive design patterns. It uses Django, HTML/CSS, and JavaScript to achieve a seamless task management experience with features like task creation, project organization, and user-friendly navigation.
 
-- 🔐 User authentication (login, logout)
-- 🧑 Worker management (list, detail views, create, update)
-- 📋 Task management (list, detail, update, assign)
-- ✅ Status tracking for tasks
-- 💅 Beautiful and responsive UI with smooth animations
-- 🔍 Debug toolbar for development
-- 🧼 Clean code with type hints and linting (Black, Ruff, Mypy)
+### 👥 For Who?
 
----
+This project is designed for:
+- 👨‍💻 Small startups, indie developers, and student teams
+- 🎓 Students learning how to structure Django projects and implement CRUD features
+- 🔍 Anyone looking for examples of a clean, responsive, and open-source task management system built with Django
+
+## 🔗 See in Action
+
+You can try the live demo here: https://it-task-manager-nws5.onrender.com/
+
+## ✨ Features
+
+- 🔐 User Authentication: Secure login and logout system
+- 🧑 Worker Management: Create, update, and view worker details
+- 📋 Task Management: Assign, update, and track tasks easily
+- ✅ Status Tracking: Visual indicators for task completion and progress
+- 💅 Responsive UI with Animations: Clean design with smooth transitions
+- 🔍 Debug Toolbar: Built-in dev tools for inspecting queries and performance
 
 ## 🧰 Tech Stack
 
-- **Backend:** Django 5.2.1
-- **Frontend:** Django Templates + Crispy Forms + Bootstrap 4
-- **Tools & Dev Dependencies:**  
-  - `black`, `ruff`, `mypy` for code formatting and linting  
-  - `django-debug-toolbar` for development insights  
-  - `python-decouple` for managing environment variables  
-  - `coverage` for test coverage reporting
+**🖥️ Frontend:**
+- Django Templates
+- Crispy Forms
+- Bootstrap 4
 
----
+**🗄️ Backend:**
+- Python 3.12+
+- Django 5.2.1
+- SQLite (default) or PostgreSQL for production
 
-## 📦 Installation
+**🛠️ Tools & Others:**
+- black, ruff – Code formatting and linting
+- django-debug-toolbar – Debugging and query inspection
+- python-decouple – Environment variable management
+- coverage – Test coverage reporting
+- Deployed on Render
+
+## 💻 Local Installation
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/it-task-manager.git
+git clone https://github.com/AntonBliznuk/it-task-manager
 cd it-task-manager
 ```
 
@@ -65,22 +82,24 @@ python manage.py migrate
 ```bash
 python manage.py runserver
 ```
-## Test user:
-login: test_user
+**🧪 Test user credentials**
+> also works in production
+- login: test_user
+- password: test_test123
 
-password: test_test123
+## 🏞️ UI Preview
+
+- YouTube: https://youtu.be/G8KSHCtaGm4
 
 ---
-## 🖼️ Screenshots
 
-## 👥 Worker List Page
-![Worker List](screenshots/worker-list.png)
+## 🤝 Contributing
 
-## 👤 Worker Detail Page
-![Worker Detail](screenshots/worker-detail.png)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📋 Task List Page
-![Task List](screenshots/task-list.png)
+## 📬 Contact
 
-## 📝 Task Detail Page
-![Task Detail](screenshots/task-detail.png)
+- **Author**: Anton Bliznuk
+- **Email**: bliznukantonmain@gmail.com
+- **GitHub**: https://github.com/AntonBliznuk
+- **LinkedIn**: https://www.linkedin.com/in/anton-bliznuk-3499b234b
