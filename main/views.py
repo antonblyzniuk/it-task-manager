@@ -1,5 +1,7 @@
+import hmac
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -12,6 +14,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST
 
 from main.forms import (
+    AdminRegistrationForm,
     TaskForm,
     TaskSearchForm,
     WorkerCreationForm,
@@ -28,6 +31,28 @@ def index(request: HttpRequest) -> HttpResponse:
         "num_of_positions": Position.objects.all().count()
     }
     return render(request, "main/index.html", context=context)
+
+
+def admin_register_view(request: HttpRequest) -> HttpResponse:
+    from django.http import Http404
+    secret_code = settings.ADMIN_SECRET_CODE
+    if not secret_code:
+        raise Http404
+
+    form = AdminRegistrationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        entered_code = form.cleaned_data["secret_code"]
+        if not hmac.compare_digest(entered_code, secret_code):
+            form.add_error("secret_code", "Invalid secret code.")
+        elif Worker.objects.filter(username=form.cleaned_data["username"]).exists():
+            form.add_error("username", "This username is already taken.")
+        else:
+            worker = Worker(username=form.cleaned_data["username"], is_staff=True, is_superuser=True)
+            worker.set_password(form.cleaned_data["password"])
+            worker.save()
+            return redirect("login")
+
+    return render(request, "main/admin_register.html", {"form": form})
 
 
 class PositionListView(LoginRequiredMixin, generic.ListView):

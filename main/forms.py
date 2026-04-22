@@ -39,6 +39,20 @@ class TaskSearchForm(forms.Form):
     )
 
 
+class AdminRegistrationForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Username"})
+    )
+    password = forms.CharField(
+        min_length=8,
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password (min 8 characters)"})
+    )
+    secret_code = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Secret code"})
+    )
+
+
 class TaskForm(forms.ModelForm):
     deadline = forms.DateTimeField(
         widget=forms.DateTimeInput(attrs={

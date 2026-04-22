@@ -68,6 +68,14 @@
     {% block content %}
     {% endblock %}
 </main>
+<footer class="bg-dark text-secondary py-3 mt-auto">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="small">&copy; 2026 IT Task Manager</span>
+        <a href="{% url 'main:admin-register' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-shield-lock me-1"></i>Want to become an admin?
+        </a>
+    </div>
+</footer>
 {% block extra_js %}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
