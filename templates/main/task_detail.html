@@ -1,175 +1,158 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
 
-  <!-- Task Detail Card -->
-  <div class="card shadow-lg rounded-4 border-0 mb-5" data-aos="fade-up">
-    <div class="card-body p-5">
-      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-        <h2 class="card-title d-flex align-items-center gap-2 mb-0">
-          <i class="bi bi-list-task text-primary fs-3"></i> {{ task.name }}
-        </h2>
-        <div class="d-flex gap-2" data-aos="fade-left" data-aos-delay="200">
-          <!-- Update -->
-          <a href="{% url 'main:task-update' pk=task.id %}" class="btn btn-outline-primary">
-            <i class="bi bi-pencil-square me-1"></i> Update
-          </a>
-          <!-- Complete -->
-          {% if not task.is_completed and user in assignees %}
-          <form method="post" action="{% url 'main:task-complete' pk=task.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-check2-circle me-1"></i> Complete
-            </button>
-          </form>
-          {% endif %}
-          <!-- Delete -->
-          <a href="{% url 'main:task-delete' pk=task.id %}" class="btn btn-outline-danger">
-            <i class="bi bi-trash3-fill me-1"></i> Delete
-          </a>
-          <!-- Assign/Unassign Me -->
-          {% if user in assignees %}
-          <form method="post" action="{% url 'main:task-unassign-worker' task_pk=task.id worker_pk=user.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-warning">
-              <i class="bi bi-person-x me-1"></i> Unassign Me
-            </button>
-          </form>
-          {% else %}
-          <form method="post" action="{% url 'main:task-assign-me' pk=task.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-info">
-              <i class="bi bi-person-plus me-1"></i> Assign Me
-            </button>
-          </form>
-          {% endif %}
-        </div>
+<div class="page-header">
+  <div>
+    <a href="{% url 'main:task-list' %}" class="btn btn-sm btn-outline-secondary mb-2">
+      <i class="bi bi-arrow-left me-1"></i> Back to Tasks
+    </a>
+    <h1 class="page-title">{{ task.name }}</h1>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'main:task-update' pk=task.id %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-pencil me-1"></i> Edit
+    </a>
+    <a href="{% url 'main:task-delete' pk=task.id %}" class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-trash3 me-1"></i> Delete
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+
+  <!-- ── Left column: task details ── -->
+  <div class="col-lg-7">
+    <div class="task-detail-card border-left-priority-{{ task.priority }}">
+
+      <!-- Status row -->
+      <div class="d-flex align-items-center gap-2 flex-wrap mb-4">
+        <span class="priority-badge {{ task.priority }}">{{ task.get_priority_display }}</span>
+        <span class="badge bg-light text-dark border" style="font-size:.75rem;">{{ task.task_type.name }}</span>
+        {% if task.is_completed %}
+          <span class="badge bg-success-subtle text-success">
+            <i class="bi bi-check-circle me-1"></i>Completed
+          </span>
+        {% elif task.deadline < today %}
+          <span class="badge bg-danger-subtle text-danger">
+            <i class="bi bi-clock me-1"></i>Overdue
+          </span>
+        {% else %}
+          <span class="badge bg-primary-subtle text-primary">
+            <i class="bi bi-hourglass me-1"></i>Active
+          </span>
+        {% endif %}
       </div>
 
-      <p class="my-4 text-muted">
-        <i class="bi bi-info-circle me-2"></i>{{ task.description }}
-      </p>
+      <!-- Description -->
+      <div class="mb-4">
+        <span class="meta-label">Description</span>
+        <p class="mb-0" style="color: var(--text-secondary); line-height: 1.6;">{{ task.description }}</p>
+      </div>
 
+      <!-- Meta grid -->
       <div class="row g-3">
-        <div class="col-md-6" data-aos="fade-right">
-          <strong>Task Type:</strong>
-          <div>
-            <span class="badge bg-info text-dark">{{ task.task_type.name }}</span>
-          </div>
+        <div class="col-6">
+          <span class="meta-label">Deadline</span>
+          <span class="meta-value {% if task.deadline < today and not task.is_completed %}text-danger{% endif %}">
+            <i class="bi bi-calendar-event me-1"></i>{{ task.deadline|date:"M d, Y H:i" }}
+          </span>
         </div>
-
-        <div class="col-md-6" data-aos="fade-left">
-          <strong>Priority:</strong>
-          <div>
-            <span class="badge 
-              {% if task.priority == 'urgent' %} bg-danger 
-              {% elif task.priority == 'high' %} bg-warning text-dark 
-              {% elif task.priority == 'medium' %} bg-primary 
-              {% else %} bg-secondary 
-              {% endif %}">
-              {{ task.get_priority_display }}
-            </span>
-          </div>
+        <div class="col-6">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">
+            <i class="bi bi-clock-history me-1"></i>{{ task.created_at|date:"M d, Y" }}
+          </span>
         </div>
-
-        <div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
-          <strong>Deadline:</strong>
-          <div><i class="bi bi-calendar-event me-1"></i>{{ task.deadline|date:"M d, Y H:i" }}</div>
+        {% if task.created_by %}
+        <div class="col-6">
+          <span class="meta-label">Created By</span>
+          <span class="meta-value">
+            <a href="{{ task.created_by.get_absolute_url }}" class="text-primary text-decoration-none">
+              {{ task.created_by.username }}
+            </a>
+          </span>
         </div>
-
-        <div class="col-md-6" data-aos="fade-left" data-aos-delay="100">
-          <strong>Deadline Status:</strong>
-          <div>
-            {% if task.deadline < today %}
-              <span class="text-danger"><i class="bi bi-x-circle-fill me-1"></i> Past Due</span>
-            {% else %}
-              <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Upcoming</span>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="col-md-6" data-aos="fade-right" data-aos-delay="200">
-          <strong>Is Completed:</strong>
-          <div>
-            {% if task.is_completed %}
-              <i class="bi bi-check-circle-fill text-success fs-5"></i>
-            {% else %}
-              <i class="bi bi-x-circle-fill text-danger fs-5"></i>
-            {% endif %}
-          </div>
+        {% endif %}
+        <div class="col-6">
+          <span class="meta-label">Last Updated</span>
+          <span class="meta-value">
+            <i class="bi bi-arrow-repeat me-1"></i>{{ task.updated_at|date:"M d, Y H:i" }}
+          </span>
         </div>
       </div>
     </div>
+
+    <!-- Action buttons -->
+    <div class="d-flex gap-2 flex-wrap mt-3">
+      {% if not task.is_completed and user in assignees %}
+      <form method="post" action="{% url 'main:task-complete' pk=task.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-sm">
+          <i class="bi bi-check2-circle me-1"></i> Mark Complete
+        </button>
+      </form>
+      {% endif %}
+
+      {% if user in assignees %}
+      <form method="post" action="{% url 'main:task-unassign-worker' task_pk=task.id worker_pk=user.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-warning btn-sm">
+          <i class="bi bi-person-x me-1"></i> Unassign Me
+        </button>
+      </form>
+      {% else %}
+      <form method="post" action="{% url 'main:task-assign-me' pk=task.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-info btn-sm">
+          <i class="bi bi-person-plus me-1"></i> Assign Me
+        </button>
+      </form>
+      {% endif %}
+    </div>
   </div>
 
-  <!-- Assignees Table -->
-  <div class="shadow-sm rounded bg-white p-4" data-aos="fade-up">
-    <h4 class="mb-4 d-flex align-items-center gap-2">
-      <i class="bi bi-people-fill text-secondary fs-4"></i> Assignees
-    </h4>
-    <table class="table table-hover align-middle w-100">
-      <thead class="table-light text-center">
-        <tr>
-          <th>Username</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Position</th>
-          <th>Assigned Tasks</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="text-center">
-        {% for worker in assignees %}
-        <tr data-aos="fade-up">
-          <td>
-            <a href="{{ worker.get_absolute_url }}" class="text-decoration-none fw-semibold">
-              {{ worker.username }}{% if user.id == worker.id %}(me){% endif %}
-            </a>
-          </td>
-          <td>{{ worker.first_name }}</td>
-          <td>{{ worker.last_name }}</td>
-          <td>{{ worker.position }}</td>
-          <td><span class="badge bg-info text-dark">{{ worker.tasks.count }}</span></td>
-          <td class="text-end">
-            <form method="post" action="{% url 'main:task-unassign-worker' task_pk=task.id worker_pk=worker.id %}" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-person-dash"></i> Unassign
-              </button>
-            </form>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="6" class="text-center text-muted">No assignees found.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- ── Right column: assignees ── -->
+  <div class="col-lg-5">
+    <div class="form-card">
+      <h5 class="fw-bold mb-3">
+        <i class="bi bi-people-fill me-2 text-primary"></i>Assignees
+        <span class="badge bg-light text-dark border ms-1">{{ assignees.count }}</span>
+      </h5>
+
+      {% for worker in assignees %}
+      <div class="d-flex align-items-center justify-content-between p-2 rounded mb-2"
+           style="background: #f8fafc; border: 1px solid var(--border-color);">
+        <div class="d-flex align-items-center gap-2">
+          <div class="user-avatar" style="width:32px;height:32px;font-size:.75rem;">
+            {{ worker.username|first|upper }}
+          </div>
+          <div>
+            <div class="small fw-semibold">
+              <a href="{{ worker.get_absolute_url }}" class="text-decoration-none text-primary">
+                {{ worker.username }}{% if user.id == worker.id %} <span class="text-muted">(you)</span>{% endif %}
+              </a>
+            </div>
+            <div class="small text-muted">{{ worker.position|default:"No position" }}</div>
+          </div>
+        </div>
+        <form method="post"
+              action="{% url 'main:task-unassign-worker' task_pk=task.id worker_pk=worker.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">
+            <i class="bi bi-person-dash"></i>
+          </button>
+        </form>
+      </div>
+      {% empty %}
+      <div class="empty-state py-3">
+        <span class="empty-state-icon"><i class="bi bi-person-x"></i></span>
+        <h5>No assignees yet</h5>
+        <p>Click <strong>Assign Me</strong> to join this task.</p>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<!-- AOS Animation + Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    AOS.init({
-      duration: 800,
-      easing: 'ease-in-out',
-      once: true,
-    });
-
-    window.addEventListener('load', () => {
-      document.querySelectorAll('[data-aos]').forEach(el => {
-        el.classList.add('aos-animate');
-      });
-    });
-  });
-</script>
 {% endblock %}
