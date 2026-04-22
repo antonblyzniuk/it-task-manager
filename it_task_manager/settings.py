@@ -31,9 +31,17 @@ DEBUG = config("DEBUG") != "False"
 
 ALLOWED_HOSTS = ["127.0.0.1"]
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+RAILWAY_PUBLIC_DOMAIN = os.environ.get("RAILWAY_PUBLIC_DOMAIN")
+if RAILWAY_PUBLIC_DOMAIN:
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
+
+EXTRA_ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "")
+if EXTRA_ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(h.strip() for h in EXTRA_ALLOWED_HOSTS.split(",") if h.strip())
 
 
 # Application definition
@@ -97,7 +105,7 @@ DATABASES = {
         'HOST': tmpPostgres.hostname,
         'PORT': tmpPostgres.port or 5432,
         'OPTIONS': {
-            'sslmode': 'require',
+            'sslmode': config('DB_SSLMODE', default='require'),
         },
     }
 }
