@@ -43,6 +43,10 @@ EXTRA_ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "")
 if EXTRA_ALLOWED_HOSTS:
     ALLOWED_HOSTS.extend(h.strip() for h in EXTRA_ALLOWED_HOSTS.split(",") if h.strip())
 
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host}" for host in ALLOWED_HOSTS if host != "127.0.0.1"
+]
+
 
 # Application definition
 
