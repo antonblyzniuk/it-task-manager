@@ -608,3 +608,84 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0,0,0,0.12) !important;
 }
+
+/* ============================================================
+   Dark theme overrides  (Bootstrap 5.3 data-bs-theme="dark")
+   ============================================================ */
+[data-bs-theme="dark"] {
+  --main-bg: #0f172a;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] body {
+  background-color: var(--main-bg);
+  color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .stat-card,
+[data-bs-theme="dark"] .form-card,
+[data-bs-theme="dark"] .data-table,
+[data-bs-theme="dark"] .filter-panel {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .task-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+[data-bs-theme="dark"] .task-card:hover { color: var(--text-primary); }
+
+[data-bs-theme="dark"] .task-detail-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .kanban-column { background: #162032; }
+
+[data-bs-theme="dark"] .count-badge {
+  background: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .mobile-header {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+[data-bs-theme="dark"] .sidebar-toggle { color: var(--text-primary); }
+
+[data-bs-theme="dark"] .main-footer {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-bs-theme="dark"] .role-admin     { background: #3d2e00; color: #fbbf24; }
+[data-bs-theme="dark"] .role-manager   { background: #0c2744; color: #38bdf8; }
+[data-bs-theme="dark"] .role-developer { background: #0a2a18; color: #34d399; }
+
+[data-bs-theme="dark"] .priority-badge.low    { background: #1e293b; }
+[data-bs-theme="dark"] .priority-badge.medium { background: #1e3a5f; }
+[data-bs-theme="dark"] .priority-badge.high   { background: #2d2000; }
+[data-bs-theme="dark"] .priority-badge.urgent { background: #2d0a0a; }
+
+[data-bs-theme="dark"] .public-layout .navbar {
+  background-color: #1e293b !important;
+  border-bottom: 1px solid #334155;
+}
+[data-bs-theme="dark"] .public-layout .navbar .navbar-brand { color: #60a5fa !important; }
+[data-bs-theme="dark"] .public-layout .navbar .nav-link { color: #94a3b8 !important; }
+
+[data-bs-theme="dark"] .card-hover:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+}

@@ -15,6 +15,20 @@ class WorkerCreationForm(UserCreationForm):
         )
 
 
+class AdminWorkerCreationForm(WorkerCreationForm):
+    role = forms.ChoiceField(
+        choices=[
+            (Worker.Role.DEVELOPER, "Developer"),
+            (Worker.Role.MANAGER, "Manager"),
+        ],
+        initial=Worker.Role.DEVELOPER,
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
+    class Meta(WorkerCreationForm.Meta):
+        fields = WorkerCreationForm.Meta.fields + ("role",)
+
+
 class WorkerPositionUpdateForm(forms.ModelForm):
     class Meta:
         model = Worker

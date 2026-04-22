@@ -5,9 +5,11 @@
 
 <div class="page-header">
   <h1 class="page-title"><i class="bi bi-people-fill me-2 text-primary"></i>Workers</h1>
-  <a href="{% url 'main:worker-create' %}" class="btn btn-primary btn-sm">
+  {% if request.user.is_admin %}
+  <a href="{% url 'main:worker-create-admin' %}" class="btn btn-primary btn-sm">
     <i class="bi bi-person-plus me-1"></i> Add Worker
   </a>
+  {% endif %}
 </div>
 
 <!-- Search -->
@@ -71,7 +73,9 @@
             <span class="empty-state-icon"><i class="bi bi-people"></i></span>
             <h5>No workers found</h5>
             <p>Try a different search term or add a new worker.</p>
-            <a href="{% url 'main:worker-create' %}" class="btn btn-sm btn-primary">+ Add Worker</a>
+            {% if request.user.is_admin %}
+            <a href="{% url 'main:worker-create-admin' %}" class="btn btn-sm btn-primary">+ Add Worker</a>
+            {% endif %}
           </div>
         </td>
       </tr>

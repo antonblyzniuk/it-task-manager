@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-bs-theme',t);}());</script>
     <meta charset="UTF-8">
     <title>IT Task Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -92,6 +93,12 @@
           <div class="user-role">{{ user.get_role_display }}</div>
         </div>
       </div>
+      <button onclick="toggleTheme()"
+              class="btn btn-sm w-100 mb-2 d-flex align-items-center justify-content-center gap-2"
+              style="background:var(--sidebar-hover-bg);color:var(--sidebar-text);border:1px solid var(--sidebar-border);">
+        <i data-theme-icon class="bi bi-moon-fill"></i>
+        <span data-theme-label>Dark Mode</span>
+      </button>
       <form method="POST" action="{% url 'logout' %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-sm btn-outline-light w-100">
@@ -120,6 +127,11 @@
       </a>
       <div class="ms-auto d-flex align-items-center gap-2">
         <a class="nav-link" href="{% url 'main:about' %}">About</a>
+        <button onclick="toggleTheme()"
+                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+                style="width:34px;height:34px;padding:0;" title="Toggle theme">
+          <i data-theme-icon class="bi bi-moon-fill"></i>
+        </button>
         <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Login</a>
         <a href="{% url 'main:worker-create' %}" class="btn btn-primary btn-sm">Register</a>
       </div>
@@ -181,6 +193,28 @@
       backdrop.classList.remove("show");
     });
   })();
+</script>
+
+<script>
+  function toggleTheme() {
+    var next = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-bs-theme', next);
+    localStorage.setItem('theme', next);
+    syncThemeButtons(next);
+  }
+
+  function syncThemeButtons(theme) {
+    document.querySelectorAll('[data-theme-icon]').forEach(function(el) {
+      el.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    });
+    document.querySelectorAll('[data-theme-label]').forEach(function(el) {
+      el.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    syncThemeButtons(document.documentElement.getAttribute('data-bs-theme') || 'light');
+  });
 </script>
 
 {% block extra_js %}{% endblock %}

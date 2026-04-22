@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 
 from main.forms import (
     AdminRegistrationForm,
+    AdminWorkerCreationForm,
     TaskFilterForm,
     TaskForm,
     WorkerCreationForm,
@@ -251,6 +252,12 @@ class WorkerCreateView(generic.CreateView):
     model = Worker
     success_url = reverse_lazy("main:worker-list")
     form_class = WorkerCreationForm
+
+
+class AdminWorkerCreateView(AdminRequiredMixin, generic.CreateView):
+    model = Worker
+    success_url = reverse_lazy("main:worker-list")
+    form_class = AdminWorkerCreationForm
 
 
 class WorkerUpdateView(SelfOrAdminMixin, generic.UpdateView):

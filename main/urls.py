@@ -27,6 +27,7 @@ urlpatterns = [
 
     path("workers/", views.WorkerListView.as_view(), name="worker-list"),
     path("workers/create/", views.WorkerCreateView.as_view(), name="worker-create"),
+    path("workers/create-admin/", views.AdminWorkerCreateView.as_view(), name="worker-create-admin"),
     path("workers/<int:pk>/detail/", views.worker_detail_view, name="worker-detail"),
     path("workers/<int:pk>/update/", views.WorkerUpdateView.as_view(), name="worker-update"),
     path("workers/<int:pk>/delete/", views.WorkerDeleteView.as_view(), name="worker-delete"),
