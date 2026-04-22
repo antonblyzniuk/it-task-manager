@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .about-btn {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .about-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+  }
+</style>
+
+<!-- Hero Section -->
+<section style="background: linear-gradient(135deg, #1e3a5f 0%, #3b82f6 100%); min-height: 340px;"
+         class="d-flex align-items-center justify-content-center text-white text-center py-5">
+  <div class="container" data-aos="fade-down">
+    <h1 class="display-5 fw-bold mb-2">IT Task Manager</h1>
+    <h5 class="fw-normal mb-4 opacity-75">A modern project management tool built with Django</h5>
+    <p class="lead mx-auto" style="max-width:700px">
+      IT Task Manager is a full-stack web application designed to help development teams organize
+      and track their work efficiently. It supports role-based access control with Admin, Manager,
+      and Developer roles, a Kanban board view, task priorities, deadlines, and team management.
+      Built as a portfolio project to demonstrate real-world Django development skills including
+      authentication, permissions, and responsive UI design.
+    </p>
+  </div>
+</section>
+
+<!-- Key Features & Tech Stack -->
+<div class="container py-5">
+  <div class="card card-hover shadow-sm p-4 mb-5" data-aos="fade-up" data-aos-delay="100">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h5 class="fw-bold mb-3">Key Features</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            Role-based access control (Admin / Manager / Developer)
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            Kanban board with drag-ready card layout
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            Task priorities: Urgent, High, Medium, Low
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            Deadline tracking and overdue detection
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            My Tasks personal view
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            Full CRUD for tasks, workers, positions, and task types
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h5 class="fw-bold mb-3">Tech Stack</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><i class="bi bi-dot fs-4 text-primary"></i> Python &amp; Django</li>
+          <li class="mb-2"><i class="bi bi-dot fs-4 text-primary"></i> PostgreSQL</li>
+          <li class="mb-2"><i class="bi bi-dot fs-4 text-primary"></i> Bootstrap 5 + Bootstrap Icons</li>
+          <li class="mb-2"><i class="bi bi-dot fs-4 text-primary"></i> AOS animations</li>
+          <li class="mb-2"><i class="bi bi-dot fs-4 text-primary"></i> GitHub Actions CI</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Links / Buttons -->
+  <div class="text-center mb-5" data-aos="zoom-in" data-aos-delay="200">
+    <h5 class="fw-bold mb-4">Find Me Online</h5>
+    <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+      <a href="https://github.com/antonblyzniuk/it-task-manager"
+         target="_blank" rel="noopener noreferrer"
+         class="btn btn-dark btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 about-btn">
+        <i class="bi bi-github fs-5"></i>
+        View on GitHub
+      </a>
+      <a href="https://www.antonblyzniuk.com"
+         target="_blank" rel="noopener noreferrer"
+         class="btn btn-outline-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 about-btn">
+        <i class="bi bi-globe2 fs-5"></i>
+        My Website
+      </a>
+    </div>
+  </div>
+
+  <!-- Developer Card -->
+  <div class="card card-hover shadow-sm p-4 mx-auto text-center" style="max-width:480px"
+       data-aos="fade-up" data-aos-delay="300">
+    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center fw-bold text-white fs-4"
+         style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6)">
+      AB
+    </div>
+    <h5 class="fw-bold mb-1">Anton Blyzniuk</h5>
+    <p class="text-muted mb-0">Full Stack Developer</p>
+  </div>
+</div>
+{% endblock %}

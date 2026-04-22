@@ -4,7 +4,7 @@ from typing import Any
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -77,12 +77,41 @@ class SelfOrAdminMixin(UserPassesTestMixin):
 # ---------------------------------------------------------------------------
 
 def index(request: HttpRequest) -> HttpResponse:
+    today = now().date()
+    num_open_tasks = Task.objects.filter(is_completed=False).count()
+    num_of_workers = Worker.objects.count()
     context = {
-        "num_of_workers": Worker.objects.all().count(),
-        "num_of_tasks": Task.objects.all().count(),
-        "num_of_positions": Position.objects.all().count()
+        "num_of_workers": num_of_workers,
+        "num_of_tasks": Task.objects.count(),
+        "num_of_positions": Position.objects.count(),
+        "num_of_task_types": TaskType.objects.count(),
+        "num_completed_tasks": Task.objects.filter(is_completed=True).count(),
+        "num_open_tasks": num_open_tasks,
+        "num_overdue_tasks": Task.objects.filter(is_completed=False, deadline__lt=today).count(),
+        "num_urgent_tasks": Task.objects.filter(priority="urgent", is_completed=False).count(),
+        "num_high_tasks": Task.objects.filter(priority="high", is_completed=False).count(),
+        "num_admins": Worker.objects.filter(role="admin").count(),
+        "num_managers": Worker.objects.filter(role="manager").count(),
+        "num_developers": Worker.objects.filter(role="developer").count(),
+        "recent_tasks": Task.objects.select_related("task_type", "created_by")
+                            .prefetch_related("assignees")
+                            .order_by("-id")[:5],
+        "completion_rate": round(
+            Task.objects.filter(is_completed=True).count() /
+            max(Task.objects.count(), 1) * 100
+        ),
+        "num_medium_low_tasks": Task.objects.filter(
+            is_completed=False, priority__in=["medium", "low"]
+        ).count(),
+        "open_tasks_max": max(num_open_tasks, 1),
+        "workers_max": max(num_of_workers, 1),
+        "now": now(),
     }
     return render(request, "main/index.html", context=context)
+
+
+def about(request: HttpRequest) -> HttpResponse:
+    return render(request, "main/about.html")
 
 
 def admin_register_view(request: HttpRequest) -> HttpResponse:
