@@ -3,7 +3,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse
@@ -15,14 +15,66 @@ from django.views.decorators.http import require_POST
 
 from main.forms import (
     AdminRegistrationForm,
+    TaskFilterForm,
     TaskForm,
-    TaskSearchForm,
     WorkerCreationForm,
     WorkerPositionUpdateForm,
     WorkerSearchForm,
 )
 from main.models import Position, Task, TaskType, Worker
 
+# ---------------------------------------------------------------------------
+# Permission mixins
+# ---------------------------------------------------------------------------
+
+class AdminRequiredMixin(UserPassesTestMixin):
+    """Only ADMIN role or superuser."""
+    raise_exception = True
+
+    def test_func(self) -> bool:
+        user = self.request.user
+        return user.is_authenticated and user.is_admin
+
+
+class ManagerRequiredMixin(UserPassesTestMixin):
+    """MANAGER, ADMIN, or superuser."""
+    raise_exception = True
+
+    def test_func(self) -> bool:
+        user = self.request.user
+        return user.is_authenticated and user.is_manager
+
+
+class TaskOwnerOrAdminMixin(UserPassesTestMixin):
+    """Task creator, any assignee, or admin can modify the task."""
+    raise_exception = True
+
+    def test_func(self) -> bool:
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
+        if user.is_admin:
+            return True
+        task = self.get_object()
+        return task.created_by == user or user in task.assignees.all()
+
+
+class SelfOrAdminMixin(UserPassesTestMixin):
+    """A worker can only modify their own profile; admins can modify anyone's."""
+    raise_exception = True
+
+    def test_func(self) -> bool:
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
+        if user.is_admin:
+            return True
+        return self.get_object().pk == user.pk
+
+
+# ---------------------------------------------------------------------------
+# General views
+# ---------------------------------------------------------------------------
 
 def index(request: HttpRequest) -> HttpResponse:
     context = {
@@ -47,7 +99,12 @@ def admin_register_view(request: HttpRequest) -> HttpResponse:
         elif Worker.objects.filter(username=form.cleaned_data["username"]).exists():
             form.add_error("username", "This username is already taken.")
         else:
-            worker = Worker(username=form.cleaned_data["username"], is_staff=True, is_superuser=True)
+            worker = Worker(
+                username=form.cleaned_data["username"],
+                is_staff=True,
+                is_superuser=True,
+                role=Worker.Role.ADMIN,
+            )
             worker.set_password(form.cleaned_data["password"])
             worker.save()
             return redirect("login")
@@ -55,29 +112,37 @@ def admin_register_view(request: HttpRequest) -> HttpResponse:
     return render(request, "main/admin_register.html", {"form": form})
 
 
+# ---------------------------------------------------------------------------
+# Position views
+# ---------------------------------------------------------------------------
+
 class PositionListView(LoginRequiredMixin, generic.ListView):
     model = Position
     queryset = Position.objects.prefetch_related("workers")
     paginate_by = 13
 
 
-class PositionCreateView(LoginRequiredMixin, generic.CreateView):
+class PositionCreateView(AdminRequiredMixin, generic.CreateView):
     model = Position
     fields = "__all__"
     success_url = reverse_lazy("main:position-list")
 
 
-class PositionUpdateView(LoginRequiredMixin, generic.UpdateView):
+class PositionUpdateView(AdminRequiredMixin, generic.UpdateView):
     model = Position
     fields = "__all__"
     success_url = reverse_lazy("main:position-list")
 
 
-class PositionDeleteView(LoginRequiredMixin, generic.DeleteView):
+class PositionDeleteView(AdminRequiredMixin, generic.DeleteView):
     model = Position
     template_name = "main/position_confirm_delete.html"
     success_url = reverse_lazy("main:position-list")
 
+
+# ---------------------------------------------------------------------------
+# TaskType views
+# ---------------------------------------------------------------------------
 
 class TaskTypeListView(LoginRequiredMixin, generic.ListView):
     model = TaskType
@@ -87,38 +152,42 @@ class TaskTypeListView(LoginRequiredMixin, generic.ListView):
     context_object_name = "task_type_list"
 
 
-class TaskTypeCreateView(LoginRequiredMixin, generic.CreateView):
+class TaskTypeCreateView(AdminRequiredMixin, generic.CreateView):
     model = TaskType
     fields = "__all__"
     success_url = reverse_lazy("main:task-type-list")
     template_name = "main/task_type_form.html"
 
 
-class TaskTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
+class TaskTypeUpdateView(AdminRequiredMixin, generic.UpdateView):
     model = TaskType
     fields = "__all__"
     success_url = reverse_lazy("main:task-type-list")
     template_name = "main/task_type_form.html"
 
 
-class TaskTypeDeleteView(LoginRequiredMixin, generic.DeleteView):
+class TaskTypeDeleteView(AdminRequiredMixin, generic.DeleteView):
     model = TaskType
     template_name = "main/task_type_confirm_delete.html"
     success_url = reverse_lazy("main:task-type-list")
 
+
+# ---------------------------------------------------------------------------
+# Worker views
+# ---------------------------------------------------------------------------
 
 class WorkerListView(LoginRequiredMixin, generic.ListView):
     model = Worker
     paginate_by = 13
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super(WorkerListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         username_or_position_name = self.request.GET.get("username_or_position_name", "")
         context["search_form"] = WorkerSearchForm(
             initial={"username_or_position_name": username_or_position_name}
         )
         return context
-    
+
     def get_queryset(self) -> QuerySet[Any]:
         queryset = Worker.objects.select_related("position").prefetch_related("tasks")
         form = WorkerSearchForm(self.request.GET)
@@ -127,7 +196,7 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
             return queryset.filter(
                 Q(username__icontains=search_term) |
                 Q(position__name__icontains=search_term)
-                )
+            )
         return queryset
 
 
@@ -155,56 +224,106 @@ class WorkerCreateView(generic.CreateView):
     form_class = WorkerCreationForm
 
 
-class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
+class WorkerUpdateView(SelfOrAdminMixin, generic.UpdateView):
     model = Worker
     success_url = reverse_lazy("main:worker-list")
     form_class = WorkerPositionUpdateForm
 
 
-class WorkerDeleteView(LoginRequiredMixin, generic.DeleteView):
+class WorkerDeleteView(AdminRequiredMixin, generic.DeleteView):
     model = Worker
     success_url = reverse_lazy("main:worker-list")
     template_name = "main/worker_confirm_delete.html"
 
 
+# ---------------------------------------------------------------------------
+# Task views
+# ---------------------------------------------------------------------------
+
 class TaskListView(LoginRequiredMixin, generic.ListView):
     model = Task
-    paginate_by = 15
+    template_name = "main/task_list.html"
+    context_object_name = "task_list"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = Task.objects.select_related("task_type").prefetch_related("assignees")
+
+        search = self.request.GET.get("search", "").strip()
+        if search:
+            qs = qs.filter(
+                Q(name__icontains=search) | Q(description__icontains=search)
+            )
+
+        priority = self.request.GET.get("priority", "")
+        if priority:
+            qs = qs.filter(priority=priority)
+
+        is_completed = self.request.GET.get("is_completed", "")
+        if is_completed == "true":
+            qs = qs.filter(is_completed=True)
+        elif is_completed == "false":
+            qs = qs.filter(is_completed=False)
+
+        task_type = self.request.GET.get("task_type", "")
+        if task_type:
+            qs = qs.filter(task_type_id=task_type)
+
+        assignee = self.request.GET.get("assignee", "")
+        if assignee:
+            qs = qs.filter(assignees__id=assignee)
+
+        return qs
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super(TaskListView, self).get_context_data(**kwargs)
-        name_or_priority = self.request.GET.get("name_or_priority", "")
-        context["search_form"] = TaskSearchForm(
-            initial={"name_or_priority": name_or_priority}
+        context = super().get_context_data(**kwargs)
+        today = now()
+        qs = self.object_list
+        context["tasks_todo"] = (
+            qs.filter(is_completed=False, deadline__gte=today).order_by("deadline")
         )
+        context["tasks_overdue"] = (
+            qs.filter(is_completed=False, deadline__lt=today).order_by("deadline")
+        )
+        context["tasks_done"] = qs.filter(is_completed=True).order_by("-updated_at")
+        context["filter_form"] = TaskFilterForm(self.request.GET)
+        context["today"] = today
+        return context
+
+
+class MyTaskListView(LoginRequiredMixin, generic.ListView):
+    model = Task
+    template_name = "main/my_task_list.html"
+    context_object_name = "task_list"
+    paginate_by = 15
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return (
+            Task.objects
+            .filter(assignees=self.request.user)
+            .select_related("task_type")
+            .order_by("is_completed", "deadline")
+        )
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
         context["today"] = now()
         return context
-    
-    def get_queryset(self) -> QuerySet[Any]:
-        queryset = Task.objects.select_related("task_type")
-        form = TaskSearchForm(self.request.GET)
-        if form.is_valid():
-            search_term = form.cleaned_data["name_or_priority"]
-            return queryset.filter(
-                Q(name__icontains=search_term) |
-                Q(priority__icontains=search_term)
-                )
-        return queryset
 
 
-class TaskCreateView(LoginRequiredMixin, generic.CreateView):
+class TaskCreateView(ManagerRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
     success_url = reverse_lazy("main:task-list")
 
-
-# class TaskDetailView(LoginRequiredMixin, generic.DetailView):
-#     model = Task
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
 
 @login_required
 def task_detail_view(request: HttpRequest, pk: int) -> HttpResponse:
-    task = get_object_or_404(Task.objects.prefetch_related("assignees"), pk=pk)
+    qs = Task.objects.select_related("created_by").prefetch_related("assignees")
+    task = get_object_or_404(qs, pk=pk)
     assignees = task.assignees.all()
 
     context = {
@@ -215,9 +334,15 @@ def task_detail_view(request: HttpRequest, pk: int) -> HttpResponse:
     return render(request, "main/task_detail.html", context=context)
 
 
-class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
+class TaskUpdateView(TaskOwnerOrAdminMixin, generic.UpdateView):
     model = Task
     form_class = TaskForm
+
+
+class TaskDeleteView(TaskOwnerOrAdminMixin, generic.DeleteView):
+    model = Task
+    template_name = "main/task_confirm_delete.html"
+    success_url = reverse_lazy("main:task-list")
 
 
 @login_required
@@ -252,9 +377,3 @@ def task_unassign_worker_view(
         task.assignees.remove(worker)
         task.save()
     return redirect("main:task-detail", pk=task_pk)
-
-
-class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Task
-    template_name = "main/task_confirm_delete.html"
-    success_url = reverse_lazy("main:task-list")

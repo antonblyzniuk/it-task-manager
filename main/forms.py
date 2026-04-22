@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
-from main.models import Task, Worker
+from main.models import Task, TaskType, Worker
 
 
 class WorkerCreationForm(UserCreationForm):
@@ -39,6 +39,40 @@ class TaskSearchForm(forms.Form):
     )
 
 
+class TaskFilterForm(forms.Form):
+    search = forms.CharField(
+        max_length=255,
+        required=False,
+        label="",
+        widget=forms.TextInput(attrs={
+            "placeholder": "Search tasks...",
+            "class": "form-control form-control-sm",
+        })
+    )
+    priority = forms.ChoiceField(
+        choices=[("", "All priorities")] + list(Task.Priority.choices),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select form-select-sm"}),
+    )
+    is_completed = forms.ChoiceField(
+        choices=[("", "All status"), ("false", "Active"), ("true", "Completed")],
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select form-select-sm"}),
+    )
+    task_type = forms.ModelChoiceField(
+        queryset=TaskType.objects.all(),
+        required=False,
+        empty_label="All types",
+        widget=forms.Select(attrs={"class": "form-select form-select-sm"}),
+    )
+    assignee = forms.ModelChoiceField(
+        queryset=get_user_model().objects.all(),
+        required=False,
+        empty_label="All assignees",
+        widget=forms.Select(attrs={"class": "form-select form-select-sm"}),
+    )
+
+
 class AdminRegistrationForm(forms.Form):
     username = forms.CharField(
         max_length=150,
@@ -46,7 +80,9 @@ class AdminRegistrationForm(forms.Form):
     )
     password = forms.CharField(
         min_length=8,
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password (min 8 characters)"})
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control", "placeholder": "Password (min 8 characters)"
+        })
     )
     secret_code = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Secret code"})
