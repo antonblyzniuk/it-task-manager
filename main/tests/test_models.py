@@ -33,7 +33,11 @@ class ModelsStrTest(TestCase):
             priority=Task.Priority.HIGH,
             task_type=TaskType(name="test_task_type")
         )
-        self.assertEqual(str(task), f"{task.name}(type: {task.task_type}, deadline: {task.deadline}, priority: {task.priority}, is_completed: {task.is_completed})")
+        expected = (
+            f"{task.name}(type: {task.task_type}, deadline: {task.deadline}, "
+            f"priority: {task.priority}, is_completed: {task.is_completed})"
+        )
+        self.assertEqual(str(task), expected)
 
 
 class ModelsGetAbsoluteUrlTest(TestCase):
