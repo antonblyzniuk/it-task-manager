@@ -37,80 +37,17 @@ The current search is a single text input. There is no way to filter by priority
 - Extend `TaskListView` with URL query params: `?priority=HIGH&is_completed=false&assignee=3`
 - Add a filter sidebar or inline filter bar to `task_list.html`
 
-**5. CI/CD with GitHub Actions**
-There is no automated testing pipeline. Every push to `main` should run tests and linting.
-- Add `.github/workflows/ci.yml` that runs `python manage.py test` and `ruff check .` on every push and pull request
-- Add a test coverage badge to the README
+**5. UI Redesign**
+The current UI uses generic Bootstrap 5 defaults. A polished, distinctive design makes the project visually memorable and shows frontend awareness.
+- Replace Bootstrap CDN with a custom design system (Tailwind CSS or a customized Bootstrap theme)
+- Redesign the task list as a Kanban-style board with columns: To Do, In Progress, Done
+- Add a proper sidebar navigation instead of the top navbar (standard in modern dashboards)
+- Improve empty states — each empty list should show an icon and a helpful call-to-action
+- Add skeleton loaders instead of blank page on load
+- Make priority and status indicators more prominent (colored left border on task cards, not just a badge)
+- Improve the task detail page layout: two-column with task info on the left and assignees/activity on the right
+- Ensure full mobile responsiveness on all list and form pages
 
----
-
-### Phase 2 — Features that make it feel real
-
-**6. Task comments**
-Tasks have no discussion. Comments are the single most-used feature in any real task tracker (GitHub Issues, Jira, Linear all have them).
-- Add a `Comment` model: `task` (FK), `author` (FK Worker), `body` (TextField), `created_at`
-- Add comment form and list to `task_detail.html`
-- Authors can delete their own comments; admins can delete any
-
-**7. Activity log / audit trail**
-There is no history of who changed what or when. This is critical for a team tool and impressive technically.
-- Add a `TaskActivity` model: `task` (FK), `actor` (FK Worker), `action` (CharField: assigned, completed, commented, updated), `timestamp`
-- Log an entry on: task create, complete, assign, unassign, comment
-- Show the activity timeline on the task detail page
-
-**8. File attachments on tasks**
-Tasks can only have text descriptions. Real work involves screenshots, specs, and documents.
-- Add a `TaskAttachment` model: `task` (FK), `file` (FileField), `uploaded_by` (FK), `uploaded_at`
-- Use `django-storages` with an S3-compatible bucket (Cloudflare R2 or AWS S3) for production file storage
-- Show attachments on task detail with download links
-
-**9. Email notifications**
-Nothing happens when you assign someone to a task or when a deadline approaches.
-- Integrate Django's email backend (SendGrid or Resend)
-- Send email on: task assigned to you, task completed, deadline within 24 hours
-- Use Celery + Redis for async email delivery so requests don't block
-
-**10. REST API with Django REST Framework**
-The app is web-only with no API. A public REST API shows backend maturity and makes the project usable by other clients (mobile, CLI, integrations).
-- Add DRF: `/api/v1/tasks/`, `/api/v1/workers/`, `/api/v1/positions/`
-- Token authentication (DRF `TokenAuthentication`)
-- Proper serializers with nested relationships (task shows assignee usernames, not just IDs)
-- Pagination, filtering, ordering at API level
-- Auto-generated API docs with `drf-spectacular` (OpenAPI/Swagger UI at `/api/docs/`)
-
----
-
-### Phase 3 — Polish that impresses
-
-**11. Analytics dashboard**
-The current homepage shows three counters. A real analytics page shows trends and is the kind of thing that makes a project feel alive.
-- Dedicated `/dashboard/` view for logged-in users
-- Charts using Chart.js (no extra backend dependency):
-  - Tasks completed per week (line chart)
-  - Task distribution by priority (doughnut chart)
-  - Worker workload: number of open tasks per person (bar chart)
-  - Overdue task count over time
-- All data computed server-side and passed as JSON to the template
-
-**12. Expanded test suite**
-The current suite has 25 tests. A resume-worthy project should hit 80%+ coverage with meaningful tests, not just status-code checks.
-- Test search and filter logic
-- Test permission rules (user A cannot delete user B's task)
-- Test all API endpoints (authentication, pagination, validation)
-- Test the activity log is written correctly
-- Add `coverage` report to CI and fail the build under 80%
-
-**13. Health check endpoint**
-Production apps need a `/health/` endpoint that monitoring tools and Railway's healthcheck can ping.
-- Return `{"status": "ok", "db": "ok"}` — actually queries the DB to confirm connectivity
-- No authentication required
-
-**14. `created_by` field on Task**
-Track who created each task so ownership-based permissions and the activity log work cleanly.
-- Add `created_by = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, related_name="created_tasks")`
-- Auto-set in `TaskCreateView.form_valid()`
-
----
 
 ## Implementation Plan
 
@@ -124,34 +61,5 @@ Track who created each task so ownership-based permissions and the activity log 
 | 4 | "My Tasks" view | Small, high-value, builds on the permission work |
 | 5 | Advanced task filtering | Builds on existing `TaskListView`; no new models |
 | 6 | GitHub Actions CI | Catches regressions from all future changes automatically |
+| 7 | UI Redesign | Done after features stabilize so the design isn't rebuilt twice; new layout wraps all existing views |
 
-### Phase 2 — 2–3 weeks
-
-| Order | Task | Why this order |
-|-------|------|----------------|
-| 7 | Task comments | New model + form + template; self-contained |
-| 8 | Activity log | Depends on comments being done so comment events can also be logged |
-| 9 | File attachments | New model + storage config; independent of comments/activity |
-| 10 | REST API | Best done after models stabilize; serializers reflect final model shape |
-| 11 | Email notifications | Last because it depends on Celery setup which is infrastructure work |
-
-### Phase 3 — 1–2 weeks
-
-| Order | Task | Why this order |
-|-------|------|----------------|
-| 12 | Analytics dashboard | All data is available once Phase 2 models exist |
-| 13 | Expanded test suite | Written last so tests cover the final feature set, not intermediate states |
-| 14 | Health check endpoint | Quick win, do it alongside testing |
-
----
-
-## What Each Phase Demonstrates on a Resume
-
-**After Phase 1:**
-Django fundamentals done right — custom permissions, data modeling with relationships, automated testing pipeline, search and filtering.
-
-**After Phase 2:**
-Full-stack feature development — REST API design, async task queues (Celery), file storage (S3), DRF serializers with nested data, OpenAPI documentation.
-
-**After Phase 3:**
-Production-grade thinking — observability (health checks), analytics with chart rendering, high test coverage with CI enforcement.
