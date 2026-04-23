@@ -29,7 +29,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG") != "False"
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
@@ -43,8 +43,9 @@ EXTRA_ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "")
 if EXTRA_ALLOWED_HOSTS:
     ALLOWED_HOSTS.extend(h.strip() for h in EXTRA_ALLOWED_HOSTS.split(",") if h.strip())
 
+_skip_csrf = {"127.0.0.1", "localhost"}
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{host}" for host in ALLOWED_HOSTS if host != "127.0.0.1"
+    f"https://{host}" for host in ALLOWED_HOSTS if host not in _skip_csrf
 ]
 
 

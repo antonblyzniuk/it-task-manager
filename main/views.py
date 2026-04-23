@@ -77,6 +77,7 @@ class SelfOrAdminMixin(UserPassesTestMixin):
 # General views
 # ---------------------------------------------------------------------------
 
+@login_required
 def index(request: HttpRequest) -> HttpResponse:
     today = now().date()
     num_open_tasks = Task.objects.filter(is_completed=False).count()

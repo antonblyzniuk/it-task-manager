@@ -1,66 +1,35 @@
 {% extends "base.html" %}
 {% load crispy_forms_filters %}
-{% load static %}
 
 {% block content %}
-<section class="d-flex justify-content-center pt-5 pb-5 bg-light min-vh-100">
-  <div class="card shadow-lg p-5 rounded-4 w-100" style="max-width: 750px;" data-aos="zoom-in">
-    <div class="card-body">
-      <h2 class="card-title text-center mb-4 fw-bold" data-aos="fade-down" data-aos-delay="100">
+<div class="form-page-container">
+  <div class="form-page-inner" data-aos="fade-up">
+    <div class="form-page-header">
+      <div class="form-page-icon">
+        <i class="bi bi-{% if form.instance.pk %}pencil-square{% else %}plus-circle-fill{% endif %}"></i>
+      </div>
+      <h2 class="form-page-title">
         {% if form.instance.pk %}Update{% else %}Create{% endif %} Task
       </h2>
-      <form method="post" novalidate data-aos="fade-up" data-aos-delay="200">
-        {% csrf_token %}
-
-        <div data-aos="fade-right" data-aos-delay="300">
-          {% for field in form %}
-            <div class="mb-4">
-              {{ field|as_crispy_field }}
-            </div>
-          {% endfor %}
-        </div>
-
-        <div class="d-flex justify-content-between mb-4" data-aos="zoom-in-up" data-aos-delay="400">
-          <a href="{% url 'main:task-list' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
-            <i class="bi bi-arrow-left me-1"></i> Cancel
-          </a>
-          <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
-            <i class="bi bi-check-circle me-2"></i>
-            {% if form.instance.pk %}Update{% else %}Create{% endif %}
-          </button>
-        </div>
-      </form>
-
-      <!-- Decorative Image -->
-      <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="500">
-        <img src="https://images.unsplash.com/vector-1741240041537-8f76753744c5?q=80&w=2748&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-             alt="Task Illustration"
-             class="img-fluid rounded-3 shadow-sm"
-             style="max-height: 400px; width: 100%; object-fit: cover;">
-      </div>
     </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          {{ field|as_crispy_field }}
+        </div>
+      {% endfor %}
+      <div class="form-page-actions">
+        <a href="{% url 'main:task-list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+          <i class="bi bi-arrow-left me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-gradient-primary rounded-pill px-4">
+          <i class="bi bi-check-circle me-1"></i>
+          {% if form.instance.pk %}Update{% else %}Create{% endif %}
+        </button>
+      </div>
+    </form>
   </div>
-</section>
-{% endblock %}
-
-{% block extra_js %}
-<!-- AOS Animation + Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        AOS.init({
-            duration: 800,
-            easing: 'ease-in-out',
-            once: true,
-        });
-
-        window.addEventListener('load', () => {
-            document.querySelectorAll('[data-aos]').forEach(el => {
-                el.classList.add('aos-animate');
-            });
-        });
-    });
-</script>
+</div>
 {% endblock %}

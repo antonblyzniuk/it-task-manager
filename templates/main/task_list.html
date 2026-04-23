@@ -4,13 +4,13 @@
 
 <div class="page-header">
   <div>
-    <h1 class="page-title"><i class="bi bi-kanban me-2 text-primary"></i>All Tasks</h1>
+    <h1 class="page-title"><i class="bi bi-kanban me-2" style="color:var(--brand)"></i>All Tasks</h1>
     <p class="text-muted small mb-0">
       {{ tasks_todo.count }} to do &middot; {{ tasks_overdue.count }} overdue &middot; {{ tasks_done.count }} done
     </p>
   </div>
   {% if request.user.is_manager %}
-  <a href="{% url 'main:task-create' %}" class="btn btn-primary">
+  <a href="{% url 'main:task-create' %}" class="btn btn-gradient-primary">
     <i class="bi bi-plus-lg me-1"></i> New Task
   </a>
   {% endif %}
@@ -54,7 +54,7 @@
 <div class="kanban-board">
 
   <!-- To Do column -->
-  <div class="kanban-column">
+  <div class="kanban-column kanban-col-todo" data-aos="fade-up" data-aos-delay="0">
     <div class="kanban-column-header">
       <span class="kanban-dot dot-todo"></span>
       <h3>To Do</h3>
@@ -65,7 +65,7 @@
       <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}">
         <div class="task-card-title">{{ task.name }}</div>
         <div class="task-card-meta">
-          <span class="badge bg-light text-dark border" style="font-size:.68rem;">{{ task.task_type.name }}</span>
+          <span class="badge bg-light text-dark border" style="font-size:.66rem;">{{ task.task_type.name }}</span>
           <span class="priority-badge {{ task.priority }}">{{ task.get_priority_display }}</span>
         </div>
         <div class="task-card-footer">
@@ -87,7 +87,7 @@
   </div>
 
   <!-- Overdue column -->
-  <div class="kanban-column">
+  <div class="kanban-column kanban-col-overdue" data-aos="fade-up" data-aos-delay="80">
     <div class="kanban-column-header">
       <span class="kanban-dot dot-overdue"></span>
       <h3>Overdue</h3>
@@ -98,7 +98,7 @@
       <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}">
         <div class="task-card-title">{{ task.name }}</div>
         <div class="task-card-meta">
-          <span class="badge bg-light text-dark border" style="font-size:.68rem;">{{ task.task_type.name }}</span>
+          <span class="badge bg-light text-dark border" style="font-size:.66rem;">{{ task.task_type.name }}</span>
           <span class="priority-badge {{ task.priority }}">{{ task.get_priority_display }}</span>
         </div>
         <div class="task-card-footer">
@@ -117,7 +117,7 @@
   </div>
 
   <!-- Done column -->
-  <div class="kanban-column">
+  <div class="kanban-column kanban-col-done" data-aos="fade-up" data-aos-delay="160">
     <div class="kanban-column-header">
       <span class="kanban-dot dot-done"></span>
       <h3>Done</h3>
@@ -128,8 +128,8 @@
       <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }} opacity-75">
         <div class="task-card-title text-decoration-line-through text-muted">{{ task.name }}</div>
         <div class="task-card-meta">
-          <span class="badge bg-light text-dark border" style="font-size:.68rem;">{{ task.task_type.name }}</span>
-          <span class="badge bg-success-subtle text-success" style="font-size:.68rem;">
+          <span class="badge bg-light text-dark border" style="font-size:.66rem;">{{ task.task_type.name }}</span>
+          <span class="badge bg-success-subtle text-success" style="font-size:.66rem;">
             <i class="bi bi-check-circle me-1"></i>Done
           </span>
         </div>

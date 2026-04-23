@@ -1,152 +1,144 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-  <!-- Worker Profile Card -->
-  <div class="card shadow-lg mb-4 p-4" data-aos="fade-up">
-    <div class="row">
-      <div class="col-md-6 d-flex align-items-center mb-3">
-        <div class="me-4 infinite-pulse delay-1">
-          <i class="bi bi-person-circle" style="font-size: 3rem; color: #0d6efd;"></i>
-        </div>
-        <div>
-          <h2 class="card-title mb-1">{{ worker.first_name }} {{ worker.last_name }}</h2>
-          <p class="mb-0 text-muted">{{ worker.position }}</p>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <!-- Additional User Info (right side) -->
-        <div class="row text-secondary small">
-          <div class="col-12 mb-2">
-            <i class="bi bi-person-badge-fill text-dark me-2"></i><strong>Username:</strong> {{ worker.username }}
-          </div>
-          <div class="col-12 mb-2">
-            <i class="bi bi-envelope-fill text-dark me-2"></i><strong>Email:</strong> {{ worker.email }}
-          </div>
-          <div class="col-12 mb-2">
-            <i class="bi bi-calendar-event text-dark me-2"></i><strong>Joined:</strong> {{ worker.date_joined|date:"M d, Y H:i" }}
-          </div>
-          <div class="col-12 mb-2">
-            <i class="bi bi-clock-history text-dark me-2"></i><strong>Last login:</strong> 
-            {% if worker.last_login %}
-              {{ worker.last_login|date:"M d, Y H:i" }}
-            {% else %}
-              Never
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Stats Cards -->
-  <div class="row mb-4">
-    <div class="col-md-6" data-aos="fade-right">
-      <div class="card stat-card text-center p-4">
-        <div class="icon text-primary mb-2">
-          <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+<!-- Worker Profile -->
+<div class="row g-4 mb-4">
+  <div class="col-12" data-aos="fade-up">
+    <div class="card shadow-sm p-4">
+      <div class="row align-items-center g-3">
+        <div class="col-auto">
+          <div class="worker-avatar-lg" style="width:64px;height:64px;font-size:1.25rem;
+               background:linear-gradient(135deg,var(--brand),#8b5cf6);border-radius:50%;
+               display:flex;align-items:center;justify-content:center;color:#fff;
+               font-weight:700;box-shadow:0 4px 16px rgba(99,102,241,0.4);">
+            {{ worker.username|first|upper }}
+          </div>
         </div>
-        <h5>Assigned Tasks</h5>
-        <p class="counter display-6">{{ assigned_tasks_count }}</p>
-      </div>
-    </div>
-    <div class="col-md-6" data-aos="fade-left">
-      <div class="card stat-card text-center p-4">
-        <div class="icon text-success mb-2">
-          <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+        <div class="col">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <h2 class="mb-0 fw-bold" style="font-size:1.35rem;">
+              {{ worker.first_name }} {{ worker.last_name }}
+            </h2>
+            <span class="role-badge role-{{ worker.role }}">{{ worker.get_role_display }}</span>
+          </div>
+          <p class="text-muted mb-0 small mt-1">{{ worker.position }}</p>
         </div>
-        <h5>Completed Tasks</h5>
-        <p class="counter display-6">{{ completed_tasks_count }}</p>
+        <div class="col-auto d-flex gap-2">
+          <a href="{% url 'main:worker-update' pk=worker.id %}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil me-1"></i>Edit
+          </a>
+          {% if request.user.is_admin %}
+          <a href="{% url 'main:worker-delete' pk=worker.id %}" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-trash3 me-1"></i>Delete
+          </a>
+          {% endif %}
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Assigned Tasks Table -->
-  <div class="card shadow-sm" data-aos="fade-up">
-    <div class="card-body">
-      <h4 class="card-title mb-4">Assigned Tasks</h4>
-      {% if assigned_tasks %}
-        <div class="table-responsive">
-          <table class="table table-hover align-middle text-center">
-            <thead class="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Task</th>
-                <th>Type</th>
-                <th>Priority</th>
-                <th>Deadline</th>
-                <th>Is Completed</th>
-                <th>Is Outdated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for task in assigned_tasks %}
-              <tr data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
-                <th>{{ task.id }}</th>
-                <td>
-                  <a href="{% url 'main:task-detail' pk=task.id %}" class="text-decoration-none fw-semibold text-primary">
-                    {{ task.name }}
-                  </a>
-                </td>
-                <td>
-                  <span class="badge bg-info text-dark">{{ task.task_type.name }}</span>
-                </td>
-                <td>
-                  {% if task.priority == "low" %}
-                    <span class="badge bg-secondary">Low</span>
-                  {% elif task.priority == "medium" %}
-                    <span class="badge bg-primary">Medium</span>
-                  {% elif task.priority == "high" %}
-                    <span class="badge bg-warning text-dark">High</span>
-                  {% elif task.priority == "urgent" %}
-                    <span class="badge bg-danger">Urgent</span>
-                  {% endif %}
-                </td>
-                <td>{{ task.deadline|date:"M d, Y H:i" }}</td>
-                <td>
-                  {% if task.is_completed %}
-                    <i class="bi bi-check-circle-fill text-success"></i>
-                  {% else %}
-                    <i class="bi bi-x-circle-fill text-danger"></i>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if task.deadline < today and not task.is_completed %}
-                    <i class="bi bi-check-circle-fill text-warning"></i>
-                  {% else %}
-                    <i class="bi bi-x-circle-fill text-muted"></i>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <hr style="border-color:var(--border-color);">
+
+      <div class="row g-3">
+        <div class="col-sm-6 col-md-3">
+          <span class="meta-label">Username</span>
+          <span class="meta-value">{{ worker.username }}</span>
         </div>
-      {% else %}
-        <p class="text-muted">No tasks assigned.</p>
-      {% endif %}
+        <div class="col-sm-6 col-md-3">
+          <span class="meta-label">Email</span>
+          <span class="meta-value">{{ worker.email|default:"—" }}</span>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="meta-label">Joined</span>
+          <span class="meta-value">{{ worker.date_joined|date:"M d, Y" }}</span>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="meta-label">Last Login</span>
+          <span class="meta-value">{% if worker.last_login %}{{ worker.last_login|date:"M d, Y H:i" }}{% else %}Never{% endif %}</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<!-- AOS Animation + Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    AOS.init({
-      duration: 800,
-      easing: 'ease-in-out',
-      once: true,
-    });
-    window.addEventListener('load', () => {
-      document.querySelectorAll('[data-aos]').forEach(el => {
-        el.classList.add('aos-animate');
-      });
-    });
-  });
-</script>
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6" data-aos="fade-up" data-aos-delay="60">
+    <div class="stat-card stat-primary card-hover text-center">
+      <div class="stat-icon primary mx-auto mb-2"><i class="bi bi-list-task"></i></div>
+      <h5 class="fw-bold mb-0 counter" data-count="{{ assigned_tasks_count }}">{{ assigned_tasks_count }}</h5>
+      <div class="text-muted small mt-1">Assigned Tasks</div>
+    </div>
+  </div>
+  <div class="col-md-6" data-aos="fade-up" data-aos-delay="120">
+    <div class="stat-card stat-success card-hover text-center">
+      <div class="stat-icon success mx-auto mb-2"><i class="bi bi-check-circle-fill"></i></div>
+      <h5 class="fw-bold mb-0 counter" data-count="{{ completed_tasks_count }}">{{ completed_tasks_count }}</h5>
+      <div class="text-muted small mt-1">Completed Tasks</div>
+    </div>
+  </div>
+</div>
+
+<!-- Assigned Tasks Table -->
+<div class="card shadow-sm" data-aos="fade-up">
+  <div class="card-header border-bottom py-3 px-4">
+    <h5 class="fw-bold mb-0"><i class="bi bi-list-check me-2 text-muted"></i>Assigned Tasks</h5>
+  </div>
+  <div class="card-body p-0">
+    {% if assigned_tasks %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle text-center mb-0">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Type</th>
+            <th>Priority</th>
+            <th>Deadline</th>
+            <th>Done</th>
+            <th>Overdue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in assigned_tasks %}
+          <tr>
+            <td class="text-start">
+              <a href="{% url 'main:task-detail' pk=task.id %}" class="text-decoration-none fw-semibold" style="color:var(--brand);">
+                {{ task.name }}
+              </a>
+            </td>
+            <td>
+              <span class="badge bg-info text-dark">{{ task.task_type.name }}</span>
+            </td>
+            <td>
+              <span class="priority-badge {{ task.priority }}">{{ task.get_priority_display }}</span>
+            </td>
+            <td class="text-muted small">{{ task.deadline|date:"M d, Y" }}</td>
+            <td>
+              {% if task.is_completed %}
+                <i class="bi bi-check-circle-fill text-success"></i>
+              {% else %}
+                <i class="bi bi-x-circle-fill text-danger"></i>
+              {% endif %}
+            </td>
+            <td>
+              {% if task.deadline < today and not task.is_completed %}
+                <i class="bi bi-exclamation-circle-fill text-warning"></i>
+              {% else %}
+                <i class="bi bi-dash text-muted"></i>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state py-4">
+      <span class="empty-state-icon"><i class="bi bi-clipboard-x"></i></span>
+      <h5>No tasks assigned</h5>
+      <p>This worker has not been assigned any tasks yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock %}

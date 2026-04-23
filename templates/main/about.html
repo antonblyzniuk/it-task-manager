@@ -2,155 +2,138 @@
 {% load static %}
 
 {% block content %}
-<style>
-  .about-btn {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .about-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
-  }
-  .skill-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.85rem;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-primary);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-    cursor: default;
-  }
-  .skill-pill:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-    border-color: #3b82f6;
-  }
-</style>
 
 <!-- Hero -->
-<section class="d-flex align-items-center justify-content-center text-white py-5"
-         style="background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #3b82f6 100%); min-height: 320px;">
-  <div class="text-center px-3" data-aos="fade-down">
+<section class="d-flex align-items-center justify-content-center text-white py-5 mb-4"
+         style="background: linear-gradient(145deg, #0b0d1a 0%, #131629 45%, #1a1d3a 100%);
+                border-radius: var(--radius);
+                min-height: 280px;
+                position: relative; overflow: hidden;"
+         data-aos="fade-up">
+  <!-- Orb decorations -->
+  <div style="position:absolute;width:300px;height:300px;border-radius:50%;
+              background:radial-gradient(circle,rgba(99,102,241,0.22) 0%,transparent 70%);
+              top:-120px;right:-80px;pointer-events:none;"></div>
+  <div style="position:absolute;width:200px;height:200px;border-radius:50%;
+              background:radial-gradient(circle,rgba(139,92,246,0.18) 0%,transparent 70%);
+              bottom:-60px;left:-40px;pointer-events:none;"></div>
+
+  <div class="text-center px-3" style="position:relative;z-index:1;">
     <div class="mx-auto mb-3 d-flex align-items-center justify-content-center fw-bold text-white"
-         style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.12);
-                border:2px solid rgba(255,255,255,0.22);font-size:1.5rem;letter-spacing:0.05em;">
+         style="width:72px;height:72px;border-radius:1.25rem;
+                background:rgba(99,102,241,0.25);border:1px solid rgba(99,102,241,0.4);
+                font-size:1.4rem;letter-spacing:0.05em;
+                box-shadow:0 0 28px rgba(99,102,241,0.35);">
       AB
     </div>
-    <h1 class="display-5 fw-bold mb-2">Anton Blyzniuk</h1>
+    <h1 class="fw-bold mb-2" style="font-size:1.75rem;letter-spacing:-0.02em;">Anton Blyzniuk</h1>
     <span class="badge px-3 py-2 mb-3 d-inline-flex align-items-center gap-2"
-          style="background:rgba(59,130,246,0.3);border:1px solid rgba(96,165,250,0.4);font-size:0.95rem;font-weight:500;">
+          style="background:rgba(99,102,241,0.3);border:1px solid rgba(165,180,252,0.35);font-size:0.875rem;font-weight:500;">
       <i class="bi bi-code-slash"></i> Backend Developer
     </span>
-    <p class="lead opacity-75 mx-auto mb-0" style="max-width:540px">
+    <p class="mb-0 mx-auto" style="max-width:500px;color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">
       Building scalable Python &amp; Django applications — focused on clean architecture,
       solid backend engineering, and reliable APIs.
     </p>
   </div>
 </section>
 
-<div class="container py-5">
-
-  <!-- About Me + Tech Stack -->
-  <div class="row g-4 mb-4">
-    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="50">
-      <div class="card card-hover shadow-sm h-100 p-4">
-        <h5 class="fw-bold mb-3">
-          <i class="bi bi-person-fill me-2 text-primary"></i>About Me
-        </h5>
-        <p class="text-muted mb-3">
-          I'm a backend developer with a focus on Python and Django. I enjoy working on
-          authentication systems, REST APIs, database modeling, and CI/CD pipelines —
-          all the parts of the stack that power what users see but rarely think about.
-        </p>
-        <p class="text-muted mb-0">
-          <strong>IT Task Manager</strong> is a portfolio project demonstrating
-          role-based permissions, Kanban-style task tracking, overdue detection,
-          and a full CI pipeline with GitHub Actions and PostgreSQL.
-        </p>
-      </div>
+<!-- About Me + Tech Stack -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="50">
+    <div class="card card-hover shadow-sm h-100 p-4">
+      <h5 class="fw-bold mb-3">
+        <i class="bi bi-person-fill me-2" style="color:var(--brand)"></i>About Me
+      </h5>
+      <p class="text-muted mb-3" style="line-height:1.65;">
+        I'm a backend developer with a focus on Python and Django. I enjoy working on
+        authentication systems, REST APIs, database modeling, and CI/CD pipelines —
+        all the parts of the stack that power what users see but rarely think about.
+      </p>
+      <p class="text-muted mb-0" style="line-height:1.65;">
+        <strong style="color:var(--text-primary)">IT Task Manager</strong> is a portfolio project demonstrating
+        role-based permissions, Kanban-style task tracking, overdue detection,
+        and a full CI pipeline with GitHub Actions and PostgreSQL.
+      </p>
     </div>
-    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="150">
-      <div class="card card-hover shadow-sm h-100 p-4">
-        <h5 class="fw-bold mb-3">
-          <i class="bi bi-tools me-2 text-primary"></i>Tech Stack
-        </h5>
-        <div class="d-flex flex-wrap gap-2">
-          <span class="skill-pill"><i class="bi bi-filetype-py text-primary"></i>Python</span>
-          <span class="skill-pill"><i class="bi bi-server text-success"></i>Django</span>
-          <span class="skill-pill"><i class="bi bi-database-fill text-info"></i>PostgreSQL</span>
-          <span class="skill-pill"><i class="bi bi-shield-check text-success"></i>REST APIs</span>
-          <span class="skill-pill"><i class="bi bi-github"></i>GitHub Actions CI</span>
-          <span class="skill-pill"><i class="bi bi-git text-warning"></i>Git</span>
-          <span class="skill-pill"><i class="bi bi-box text-secondary"></i>Docker</span>
-          <span class="skill-pill"><i class="bi bi-layout-text-window text-primary"></i>Bootstrap 5</span>
-        </div>
+  </div>
+  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="120">
+    <div class="card card-hover shadow-sm h-100 p-4">
+      <h5 class="fw-bold mb-3">
+        <i class="bi bi-tools me-2" style="color:var(--brand)"></i>Tech Stack
+      </h5>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="skill-pill"><i class="bi bi-filetype-py text-primary"></i>Python</span>
+        <span class="skill-pill"><i class="bi bi-server text-success"></i>Django</span>
+        <span class="skill-pill"><i class="bi bi-database-fill text-info"></i>PostgreSQL</span>
+        <span class="skill-pill"><i class="bi bi-shield-check text-success"></i>REST APIs</span>
+        <span class="skill-pill"><i class="bi bi-github"></i>GitHub Actions CI</span>
+        <span class="skill-pill"><i class="bi bi-git text-warning"></i>Git</span>
+        <span class="skill-pill"><i class="bi bi-box text-secondary"></i>Docker</span>
+        <span class="skill-pill"><i class="bi bi-layout-text-window" style="color:var(--brand)"></i>Bootstrap 5</span>
       </div>
     </div>
   </div>
-
-  <!-- Project Features -->
-  <div class="card card-hover shadow-sm p-4 mb-5" data-aos="fade-up" data-aos-delay="100">
-    <h5 class="fw-bold mb-3">
-      <i class="bi bi-kanban-fill me-2 text-primary"></i>IT Task Manager — Key Features
-    </h5>
-    <div class="row g-2">
-      <div class="col-md-6">
-        <ul class="list-unstyled mb-0">
-          <li class="mb-2">
-            <i class="bi bi-check-circle-fill text-success me-2"></i>
-            Role-based access control (Admin / Manager / Developer)
-          </li>
-          <li class="mb-2">
-            <i class="bi bi-check-circle-fill text-success me-2"></i>
-            Kanban board with priority-coloured cards
-          </li>
-          <li class="mb-2">
-            <i class="bi bi-check-circle-fill text-success me-2"></i>
-            Deadline tracking and overdue detection
-          </li>
-        </ul>
-      </div>
-      <div class="col-md-6">
-        <ul class="list-unstyled mb-0">
-          <li class="mb-2">
-            <i class="bi bi-check-circle-fill text-success me-2"></i>
-            My Tasks personal view
-          </li>
-          <li class="mb-2">
-            <i class="bi bi-check-circle-fill text-success me-2"></i>
-            Full CRUD for tasks, workers, positions, task types
-          </li>
-          <li class="mb-2">
-            <i class="bi bi-check-circle-fill text-success me-2"></i>
-            GitHub Actions CI with PostgreSQL service
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Links -->
-  <div class="text-center" data-aos="zoom-in" data-aos-delay="200">
-    <h5 class="fw-bold mb-4">Find Me Online</h5>
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="https://github.com/antonblyzniuk/it-task-manager"
-         target="_blank" rel="noopener noreferrer"
-         class="btn btn-dark btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 about-btn">
-        <i class="bi bi-github fs-5"></i>
-        View on GitHub
-      </a>
-      <a href="https://www.antonblyzniuk.com"
-         target="_blank" rel="noopener noreferrer"
-         class="btn btn-outline-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 about-btn">
-        <i class="bi bi-globe2 fs-5"></i>
-        My Website
-      </a>
-    </div>
-  </div>
-
 </div>
+
+<!-- Project Features -->
+<div class="card card-hover shadow-sm p-4 mb-4" data-aos="fade-up" data-aos-delay="80">
+  <h5 class="fw-bold mb-3">
+    <i class="bi bi-kanban-fill me-2" style="color:var(--brand)"></i>IT Task Manager — Key Features
+  </h5>
+  <div class="row g-2">
+    <div class="col-md-6">
+      <ul class="list-unstyled mb-0">
+        <li class="mb-2 d-flex align-items-start gap-2">
+          <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+          <span>Role-based access control (Admin / Manager / Developer)</span>
+        </li>
+        <li class="mb-2 d-flex align-items-start gap-2">
+          <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+          <span>Kanban board with priority-coloured cards</span>
+        </li>
+        <li class="mb-2 d-flex align-items-start gap-2">
+          <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+          <span>Deadline tracking and overdue detection</span>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <ul class="list-unstyled mb-0">
+        <li class="mb-2 d-flex align-items-start gap-2">
+          <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+          <span>My Tasks personal view with pagination</span>
+        </li>
+        <li class="mb-2 d-flex align-items-start gap-2">
+          <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+          <span>Full CRUD for tasks, workers, positions, task types</span>
+        </li>
+        <li class="mb-2 d-flex align-items-start gap-2">
+          <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+          <span>GitHub Actions CI with PostgreSQL service</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Links -->
+<div class="text-center pb-2" data-aos="zoom-in" data-aos-delay="100">
+  <h5 class="fw-bold mb-4">Find Me Online</h5>
+  <div class="d-flex justify-content-center gap-3 flex-wrap">
+    <a href="https://github.com/antonblyzniuk/it-task-manager"
+       target="_blank" rel="noopener noreferrer"
+       class="btn btn-dark btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 about-btn">
+      <i class="bi bi-github fs-5"></i>
+      View on GitHub
+    </a>
+    <a href="https://www.antonblyzniuk.com"
+       target="_blank" rel="noopener noreferrer"
+       class="btn btn-outline-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 about-btn">
+      <i class="bi bi-globe2 fs-5"></i>
+      My Website
+    </a>
+  </div>
+</div>
+
 {% endblock %}

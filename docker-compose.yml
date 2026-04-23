@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: it_task_manager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: "local-dev-secret-key-change-in-production"
+      DEBUG: "True"
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/it_task_manager"
+      DB_SSLMODE: "disable"
+      ALLOWED_HOSTS: "localhost,0.0.0.0"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

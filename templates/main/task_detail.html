@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="page-header" data-aos="fade-up">
   <div>
     <a href="{% url 'main:task-list' %}" class="btn btn-sm btn-outline-secondary mb-2">
       <i class="bi bi-arrow-left me-1"></i> Back to Tasks
@@ -21,8 +21,8 @@
 
 <div class="row g-4">
 
-  <!-- ── Left column: task details ── -->
-  <div class="col-lg-7">
+  <!-- Left column -->
+  <div class="col-lg-7" data-aos="fade-up" data-aos-delay="60">
     <div class="task-detail-card border-left-priority-{{ task.priority }}">
 
       <!-- Status row -->
@@ -47,7 +47,7 @@
       <!-- Description -->
       <div class="mb-4">
         <span class="meta-label">Description</span>
-        <p class="mb-0" style="color: var(--text-secondary); line-height: 1.6;">{{ task.description }}</p>
+        <p class="mb-0" style="color: var(--text-secondary); line-height: 1.65;">{{ task.description }}</p>
       </div>
 
       <!-- Meta grid -->
@@ -68,7 +68,7 @@
         <div class="col-6">
           <span class="meta-label">Created By</span>
           <span class="meta-value">
-            <a href="{{ task.created_by.get_absolute_url }}" class="text-primary text-decoration-none">
+            <a href="{{ task.created_by.get_absolute_url }}" class="text-decoration-none" style="color:var(--brand)">
               {{ task.created_by.username }}
             </a>
           </span>
@@ -104,7 +104,7 @@
       {% else %}
       <form method="post" action="{% url 'main:task-assign-me' pk=task.id %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-outline-info btn-sm">
+        <button type="submit" class="btn btn-outline-primary btn-sm">
           <i class="bi bi-person-plus me-1"></i> Assign Me
         </button>
       </form>
@@ -112,24 +112,24 @@
     </div>
   </div>
 
-  <!-- ── Right column: assignees ── -->
-  <div class="col-lg-5">
+  <!-- Right column: assignees -->
+  <div class="col-lg-5" data-aos="fade-up" data-aos-delay="120">
     <div class="form-card">
       <h5 class="fw-bold mb-3">
-        <i class="bi bi-people-fill me-2 text-primary"></i>Assignees
+        <i class="bi bi-people-fill me-2" style="color:var(--brand)"></i>Assignees
         <span class="badge bg-light text-dark border ms-1">{{ assignees.count }}</span>
       </h5>
 
       {% for worker in assignees %}
       <div class="d-flex align-items-center justify-content-between p-2 rounded mb-2"
-           style="background: #f8fafc; border: 1px solid var(--border-color);">
+           style="background: var(--main-bg); border: 1px solid var(--border-color);">
         <div class="d-flex align-items-center gap-2">
-          <div class="user-avatar" style="width:32px;height:32px;font-size:.75rem;">
+          <div class="user-avatar" style="width:30px;height:30px;font-size:.72rem;">
             {{ worker.username|first|upper }}
           </div>
           <div>
             <div class="small fw-semibold">
-              <a href="{{ worker.get_absolute_url }}" class="text-decoration-none text-primary">
+              <a href="{{ worker.get_absolute_url }}" class="text-decoration-none" style="color:var(--brand)">
                 {{ worker.username }}{% if user.id == worker.id %} <span class="text-muted">(you)</span>{% endif %}
               </a>
             </div>

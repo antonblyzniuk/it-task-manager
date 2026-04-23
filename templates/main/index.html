@@ -8,14 +8,17 @@
     <h1 class="page-title">Dashboard</h1>
     <p class="text-muted small mb-0">{{ now|date:"F j, Y" }}</p>
   </div>
+  <a href="{% url 'main:task-list' %}" class="btn btn-gradient-primary btn-sm">
+    <i class="bi bi-kanban me-1"></i> View Board
+  </a>
 </div>
 
-<!-- Primary Stats Row -->
+<!-- Primary Stats -->
 <div class="row g-3 mb-4">
   <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="0">
-    <div class="stat-card card-hover h-100">
+    <div class="stat-card stat-primary card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2 text-primary"><i class="bi bi-list-task"></i></div>
+        <div class="stat-icon primary"><i class="bi bi-list-task"></i></div>
         <div>
           <div class="text-muted small">Total Tasks</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_of_tasks }}">0</div>
@@ -23,10 +26,10 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
-    <div class="stat-card card-hover h-100">
+  <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="80">
+    <div class="stat-card stat-success card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2 text-success"><i class="bi bi-check-circle-fill"></i></div>
+        <div class="stat-icon success"><i class="bi bi-check-circle-fill"></i></div>
         <div>
           <div class="text-muted small">Completed</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_completed_tasks }}">0</div>
@@ -34,10 +37,10 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
-    <div class="stat-card card-hover h-100">
+  <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="160">
+    <div class="stat-card stat-warning card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2 text-warning"><i class="bi bi-hourglass-split"></i></div>
+        <div class="stat-icon warning"><i class="bi bi-hourglass-split"></i></div>
         <div>
           <div class="text-muted small">Open Tasks</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_open_tasks }}">0</div>
@@ -45,10 +48,10 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="300">
-    <div class="stat-card card-hover h-100">
+  <div class="col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="240">
+    <div class="stat-card stat-danger card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2 text-danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <div class="stat-icon danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
         <div>
           <div class="text-muted small">Overdue</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_overdue_tasks }}">0</div>
@@ -58,12 +61,12 @@
   </div>
 </div>
 
-<!-- Secondary Stats Row -->
+<!-- Secondary Stats -->
 <div class="row g-3 mb-4">
   <div class="col-sm-6 col-xl-4" data-aos="fade-up" data-aos-delay="0">
-    <div class="stat-card card-hover h-100">
+    <div class="stat-card stat-primary card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2 text-primary"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-icon primary"><i class="bi bi-people-fill"></i></div>
         <div>
           <div class="text-muted small">Total Workers</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_of_workers }}">0</div>
@@ -71,10 +74,10 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-4" data-aos="fade-up" data-aos-delay="100">
-    <div class="stat-card card-hover h-100">
+  <div class="col-sm-6 col-xl-4" data-aos="fade-up" data-aos-delay="80">
+    <div class="stat-card stat-info card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2 text-info"><i class="bi bi-diagram-3-fill"></i></div>
+        <div class="stat-icon info"><i class="bi bi-diagram-3-fill"></i></div>
         <div>
           <div class="text-muted small">Positions</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_of_positions }}">0</div>
@@ -82,10 +85,10 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-4" data-aos="fade-up" data-aos-delay="200">
-    <div class="stat-card card-hover h-100">
+  <div class="col-sm-6 col-xl-4" data-aos="fade-up" data-aos-delay="160">
+    <div class="stat-card stat-violet card-hover h-100">
       <div class="d-flex align-items-center gap-3">
-        <div class="icon fs-2" style="color:#8b5cf6"><i class="bi bi-tags-fill"></i></div>
+        <div class="stat-icon violet"><i class="bi bi-tags-fill"></i></div>
         <div>
           <div class="text-muted small">Task Types</div>
           <div class="fs-3 fw-bold counter" data-count="{{ num_of_task_types }}">0</div>
@@ -95,19 +98,20 @@
   </div>
 </div>
 
-<!-- Priority Breakdown & Team Composition -->
+<!-- Priority + Role Breakdown -->
 <div class="row g-3 mb-4">
-  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="80">
     <div class="card card-hover shadow-sm h-100 p-4">
-      <h6 class="fw-bold mb-3">Open Tasks by Priority</h6>
+      <h6 class="fw-bold mb-3"><i class="bi bi-flag-fill me-2" style="color:var(--brand)"></i>Open Tasks by Priority</h6>
       <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center mb-1">
           <span class="small fw-semibold text-danger">Urgent</span>
           <span class="badge bg-danger">{{ num_urgent_tasks }}</span>
         </div>
         <div class="progress" style="height:8px">
-          <div class="progress-bar bg-danger"
-               style="width:{% widthratio num_urgent_tasks open_tasks_max 100 %}%"></div>
+          <div class="progress-bar bg-danger progress-bar-animate"
+               data-width="{% widthratio num_urgent_tasks open_tasks_max 100 %}%"
+               style="width:0"></div>
         </div>
       </div>
       <div class="mb-3">
@@ -116,8 +120,9 @@
           <span class="badge bg-warning text-dark">{{ num_high_tasks }}</span>
         </div>
         <div class="progress" style="height:8px">
-          <div class="progress-bar bg-warning"
-               style="width:{% widthratio num_high_tasks open_tasks_max 100 %}%"></div>
+          <div class="progress-bar bg-warning progress-bar-animate"
+               data-width="{% widthratio num_high_tasks open_tasks_max 100 %}%"
+               style="width:0"></div>
         </div>
       </div>
       <div class="mb-3">
@@ -126,88 +131,116 @@
           <span class="badge bg-secondary">{{ num_medium_low_tasks }}</span>
         </div>
         <div class="progress" style="height:8px">
-          <div class="progress-bar bg-secondary"
-               style="width:{% widthratio num_medium_low_tasks open_tasks_max 100 %}%"></div>
+          <div class="progress-bar bg-secondary progress-bar-animate"
+               data-width="{% widthratio num_medium_low_tasks open_tasks_max 100 %}%"
+               style="width:0"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="160">
     <div class="card card-hover shadow-sm h-100 p-4">
-      <h6 class="fw-bold mb-3">Team by Role</h6>
+      <h6 class="fw-bold mb-3"><i class="bi bi-people-fill me-2" style="color:var(--brand)"></i>Team by Role</h6>
       <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center mb-1">
           <span class="small fw-semibold">
-            <i class="bi bi-shield-fill text-primary me-1"></i> Admin
+            <i class="bi bi-shield-fill text-primary me-1"></i>Admin
           </span>
           <span class="badge bg-primary">{{ num_admins }}</span>
         </div>
         <div class="progress" style="height:8px">
-          <div class="progress-bar bg-primary"
-               style="width:{% widthratio num_admins workers_max 100 %}%"></div>
+          <div class="progress-bar bg-primary progress-bar-animate"
+               data-width="{% widthratio num_admins workers_max 100 %}%"
+               style="width:0"></div>
         </div>
       </div>
       <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center mb-1">
           <span class="small fw-semibold">
-            <i class="bi bi-person-badge-fill text-success me-1"></i> Manager
+            <i class="bi bi-person-badge-fill text-success me-1"></i>Manager
           </span>
           <span class="badge bg-success">{{ num_managers }}</span>
         </div>
         <div class="progress" style="height:8px">
-          <div class="progress-bar bg-success"
-               style="width:{% widthratio num_managers workers_max 100 %}%"></div>
+          <div class="progress-bar bg-success progress-bar-animate"
+               data-width="{% widthratio num_managers workers_max 100 %}%"
+               style="width:0"></div>
         </div>
       </div>
       <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center mb-1">
           <span class="small fw-semibold">
-            <i class="bi bi-code-slash me-1" style="color:#8b5cf6"></i> Developer
+            <i class="bi bi-code-slash me-1" style="color:#8b5cf6"></i>Developer
           </span>
           <span class="badge" style="background:#8b5cf6">{{ num_developers }}</span>
         </div>
         <div class="progress" style="height:8px">
-          <div class="progress-bar"
-               style="background:#8b5cf6;width:{% widthratio num_developers workers_max 100 %}%"></div>
+          <div class="progress-bar progress-bar-animate"
+               data-width="{% widthratio num_developers workers_max 100 %}%"
+               style="background:#8b5cf6;width:0"></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Completion Rate -->
+<!-- Overall Completion (Ring) -->
 <div class="row g-3 mb-4">
-  <div class="col-12" data-aos="fade-up" data-aos-delay="0">
+  <div class="col-12" data-aos="fade-up">
     <div class="card card-hover shadow-sm p-4">
-      <h6 class="fw-bold mb-3">Overall Task Completion</h6>
-      <div class="text-center mb-3">
-        <span class="display-4 fw-bold
-          {% if completion_rate > 70 %}text-success
-          {% elif completion_rate > 40 %}text-warning
-          {% else %}text-danger{% endif %}">{{ completion_rate }}%</span>
-      </div>
-      <div class="progress" style="height:12px">
-        <div class="progress-bar
-          {% if completion_rate > 70 %}bg-success
-          {% elif completion_rate > 40 %}bg-warning
-          {% else %}bg-danger{% endif %}"
-             style="width:{{ completion_rate }}%"></div>
+      <h6 class="fw-bold mb-4"><i class="bi bi-bullseye me-2" style="color:var(--brand)"></i>Overall Task Completion</h6>
+      <div class="ring-wrap">
+        <div class="ring-progress"
+             style="--pct:{{ completion_rate }};--clr:{% if completion_rate > 70 %}#10b981{% elif completion_rate > 40 %}#f59e0b{% else %}#ef4444{% endif %};">
+          <div class="ring-inner">
+            <span class="ring-value"
+                  style="color:{% if completion_rate > 70 %}#10b981{% elif completion_rate > 40 %}#f59e0b{% else %}#ef4444{% endif %};">
+              {{ completion_rate }}%
+            </span>
+            <span class="ring-label">Complete</span>
+          </div>
+        </div>
+        <div class="ring-stats">
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <span style="width:10px;height:10px;border-radius:50%;background:#10b981;flex-shrink:0;display:inline-block;"></span>
+              <span class="small text-muted flex-grow-1">Completed</span>
+              <span class="fw-bold">{{ num_completed_tasks }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:inline-block;"></span>
+              <span class="small text-muted flex-grow-1">In Progress</span>
+              <span class="fw-bold">{{ num_open_tasks }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span style="width:10px;height:10px;border-radius:50%;background:#ef4444;flex-shrink:0;display:inline-block;"></span>
+              <span class="small text-muted flex-grow-1">Overdue</span>
+              <span class="fw-bold">{{ num_overdue_tasks }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 pt-2" style="border-top:1px solid var(--border-color);">
+              <span style="width:10px;height:10px;border-radius:50%;background:var(--brand);flex-shrink:0;display:inline-block;"></span>
+              <span class="small text-muted flex-grow-1">Total Tasks</span>
+              <span class="fw-bold">{{ num_of_tasks }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Recent Tasks Table -->
+<!-- Recent Tasks -->
 <div class="row g-3">
-  <div class="col-12" data-aos="fade-up" data-aos-delay="0">
+  <div class="col-12" data-aos="fade-up">
     <div class="card shadow-sm">
-      <div class="card-header bg-white border-bottom py-3 px-4">
-        <h6 class="fw-bold mb-0">Recently Added Tasks</h6>
+      <div class="card-header border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
+        <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-muted"></i>Recently Added Tasks</h6>
+        <a href="{% url 'main:task-list' %}" class="btn btn-sm btn-outline-primary">View all</a>
       </div>
       <div class="card-body p-0">
-        <table class="table table-hover table-sm mb-0">
-          <thead class="table-light">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
             <tr>
               <th class="px-4">Task</th>
               <th>Type</th>
@@ -221,7 +254,7 @@
             <tr>
               <td class="px-4">
                 <a href="{% url 'main:task-detail' task.pk %}"
-                   class="text-decoration-none fw-semibold text-primary">
+                   class="text-decoration-none fw-semibold" style="color:var(--brand);">
                   {{ task.name }}
                 </a>
               </td>
@@ -248,7 +281,7 @@
             </tr>
             {% empty %}
             <tr>
-              <td colspan="5" class="text-center text-muted px-4 py-3">No tasks yet.</td>
+              <td colspan="5" class="text-center text-muted px-4 py-4">No tasks yet.</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -259,27 +292,4 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    setTimeout(function () {
-      document.querySelectorAll(".counter").forEach(function (counter) {
-        var target = +counter.getAttribute("data-count");
-        var count = 0;
-        var speed = 60;
-        var step = Math.ceil(target / speed) || 1;
-        function animate() {
-          count += step;
-          if (count < target) {
-            counter.innerText = count;
-            setTimeout(animate, 20);
-          } else {
-            counter.innerText = target;
-          }
-        }
-        animate();
-      });
-    }, 300);
-  });
-</script>
-{% endblock %}
+{% block extra_js %}{% endblock %}

@@ -2,9 +2,9 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="page-header" data-aos="fade-up">
   <div>
-    <h1 class="page-title"><i class="bi bi-person-check-fill me-2 text-primary"></i>My Tasks</h1>
+    <h1 class="page-title"><i class="bi bi-person-check-fill me-2" style="color:var(--brand)"></i>My Tasks</h1>
     <p class="text-muted small mb-0">Tasks assigned to you</p>
   </div>
   <a href="{% url 'main:task-list' %}" class="btn btn-outline-secondary btn-sm">
@@ -15,21 +15,21 @@
 {% if task_list %}
 <div class="d-flex flex-column gap-2">
   {% for task in task_list %}
-  <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}">
+  <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0 }}0">
     <div class="d-flex align-items-start justify-content-between gap-3">
       <div class="flex-grow-1 overflow-hidden">
         <div class="task-card-title {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
           {{ task.name }}
         </div>
         <div class="task-card-meta mt-1">
-          <span class="badge bg-light text-dark border" style="font-size:.68rem;">{{ task.task_type.name }}</span>
+          <span class="badge bg-light text-dark border" style="font-size:.67rem;">{{ task.task_type.name }}</span>
           <span class="priority-badge {{ task.priority }}">{{ task.get_priority_display }}</span>
           {% if task.is_completed %}
-            <span class="badge bg-success-subtle text-success" style="font-size:.68rem;">
+            <span class="badge bg-success-subtle text-success" style="font-size:.67rem;">
               <i class="bi bi-check-circle me-1"></i>Done
             </span>
           {% elif task.deadline < today %}
-            <span class="badge bg-danger-subtle text-danger" style="font-size:.68rem;">
+            <span class="badge bg-danger-subtle text-danger" style="font-size:.67rem;">
               <i class="bi bi-clock me-1"></i>Overdue
             </span>
           {% endif %}
@@ -49,11 +49,11 @@
 </div>
 
 {% else %}
-<div class="empty-state py-5">
+<div class="empty-state py-5" data-aos="fade-up">
   <span class="empty-state-icon"><i class="bi bi-person-check"></i></span>
   <h5>No tasks assigned to you yet</h5>
   <p>
-    Browse <a href="{% url 'main:task-list' %}">all tasks</a> and click
+    Browse <a href="{% url 'main:task-list' %}" style="color:var(--brand)">all tasks</a> and click
     <strong>Assign Me</strong> on any task to get started.
   </p>
 </div>
