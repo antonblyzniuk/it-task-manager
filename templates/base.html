@@ -130,22 +130,14 @@
         </li>
       </ul>
 
-      <div class="nav-section-label mt-2">Account</div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="sidebar-link" href="{{ request.user.get_absolute_url }}">
-            <i class="bi bi-person-circle"></i> My Profile
-          </a>
-        </li>
-      </ul>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-info">
+      <a href="{% url 'main:worker-detail' pk=user.pk %}" class="user-info text-decoration-none">
         <div class="user-avatar">{{ user.username|first|upper }}</div>
         <div class="overflow-hidden">
           <div class="user-name">{{ user.username }}</div>
         </div>
-      </div>
+      </a>
       <button onclick="toggleTheme()" class="sidebar-action-btn">
         <i data-theme-icon class="bi bi-moon-fill"></i>
         <span data-theme-label>Dark Mode</span>

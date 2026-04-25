@@ -109,7 +109,7 @@ body {
    ============================================================ */
 .sidebar {
   width: var(--sidebar-width);
-  min-height: 100vh;
+  height: 100vh;
   background: var(--sidebar-bg);
   position: fixed;
   top: 0;
@@ -118,8 +118,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: transform var(--t-slow);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   border-right: 1px solid var(--sidebar-border);
 }
 
@@ -179,6 +178,8 @@ body {
 .sidebar-nav {
   padding: 0.75rem 0.625rem;
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .nav-section-label {
@@ -237,6 +238,12 @@ body {
   border-radius: var(--radius-sm);
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.user-info:hover {
+  background: var(--sidebar-hover-bg);
+  border-color: rgba(99,102,241,0.3);
 }
 .user-avatar {
   width: 30px;
