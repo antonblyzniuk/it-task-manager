@@ -26,7 +26,7 @@ from main.forms import (
     WorkerPositionUpdateForm,
     WorkerSearchForm,
 )
-from main.models import Position, Project, ProjectMembership, Task, TaskType, Worker
+from main.models import OneTimeInvite, Position, Project, ProjectMembership, Task, TaskType, Worker
 
 
 # ---------------------------------------------------------------------------
@@ -42,16 +42,14 @@ class AdminRequiredMixin(UserPassesTestMixin):
         return user.is_authenticated and user.is_admin
 
 
-class SelfOrAdminMixin(UserPassesTestMixin):
-    """A worker can only modify their own profile; global admins can modify anyone's."""
+class SelfOnlyMixin(UserPassesTestMixin):
+    """A worker can only modify their own profile."""
     raise_exception = True
 
     def test_func(self) -> bool:
         user = self.request.user
         if not user.is_authenticated:
             return False
-        if user.is_admin:
-            return True
         return self.get_object().pk == user.pk
 
 
@@ -213,17 +211,37 @@ def join_project_view(request: HttpRequest) -> HttpResponse:
     form = JoinProjectForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         key = form.cleaned_data["secret_key"].strip()
+
+        # Try multi-use project key first
         try:
             project = Project.objects.get(secret_key=key)
-        except Project.DoesNotExist:
-            form.add_error("secret_key", "No project found with this key.")
-        else:
             ProjectMembership.objects.get_or_create(
                 project=project,
                 worker=request.user,
                 defaults={"role": ProjectMembership.Role.MEMBER},
             )
             return redirect("main:project-detail", project_pk=project.pk)
+        except Project.DoesNotExist:
+            pass
+
+        # Try one-time invite key
+        try:
+            invite = OneTimeInvite.objects.select_related("project", "position").get(key=key)
+        except OneTimeInvite.DoesNotExist:
+            form.add_error("secret_key", "No project found with this key.")
+        else:
+            membership, created = ProjectMembership.objects.get_or_create(
+                project=invite.project,
+                worker=request.user,
+                defaults={"role": ProjectMembership.Role.MEMBER, "position": invite.position},
+            )
+            if not created and invite.position:
+                membership.position = invite.position
+                membership.save(update_fields=["position"])
+            project_pk = invite.project_id
+            invite.delete()
+            return redirect("main:project-detail", project_pk=project_pk)
+
     return render(request, "main/join_project.html", {"form": form})
 
 
@@ -283,12 +301,49 @@ def project_invite_view(request: HttpRequest, project_pk: int) -> HttpResponse:
     project, role = _get_project_membership(request.user, project_pk)
     if role not in ("admin", "owner"):
         raise PermissionDenied
+    one_time_invites = (
+        OneTimeInvite.objects
+        .filter(project=project)
+        .select_related("position", "created_by")
+    )
     return render(request, "main/project_invite.html", {
         "project": project,
+        "positions": project.positions.all(),
+        "one_time_invites": one_time_invites,
         "user_project_role": role,
         "user_is_project_admin": True,
         "user_is_project_owner": role == "owner",
     })
+
+
+@login_required
+@require_POST
+def project_create_one_time_invite_view(request: HttpRequest, project_pk: int) -> HttpResponse:
+    project, role = _get_project_membership(request.user, project_pk)
+    if role not in ("admin", "owner"):
+        raise PermissionDenied
+    position_id = request.POST.get("position") or None
+    position = None
+    if position_id:
+        position = get_object_or_404(Position, pk=position_id, project=project)
+    OneTimeInvite.objects.create(
+        project=project,
+        key=OneTimeInvite.generate_key(),
+        position=position,
+        created_by=request.user,
+    )
+    return redirect("main:project-invite", project_pk=project_pk)
+
+
+@login_required
+@require_POST
+def project_revoke_one_time_invite_view(request: HttpRequest, project_pk: int, invite_pk: int) -> HttpResponse:
+    project, role = _get_project_membership(request.user, project_pk)
+    if role not in ("admin", "owner"):
+        raise PermissionDenied
+    invite = get_object_or_404(OneTimeInvite, pk=invite_pk, project=project)
+    invite.delete()
+    return redirect("main:project-invite", project_pk=project_pk)
 
 
 @login_required
@@ -307,10 +362,12 @@ def project_members_view(request: HttpRequest, project_pk: int) -> HttpResponse:
     project, role = _get_project_membership(request.user, project_pk)
     if role is None:
         raise PermissionDenied
-    memberships = project.memberships.select_related("worker", "worker__position").all()
+    memberships = project.memberships.select_related("worker", "position").all()
+    positions = list(project.positions.all()) if role in ("admin", "owner") else []
     return render(request, "main/project_members.html", {
         "project": project,
         "memberships": memberships,
+        "positions": positions,
         "user_project_role": role,
         "user_is_project_admin": role in ("admin", "owner"),
         "user_is_project_owner": role == "owner",
@@ -351,6 +408,23 @@ def project_set_member_role_view(request: HttpRequest, project_pk: int, worker_p
 
 @login_required
 @require_POST
+def project_set_member_position_view(request: HttpRequest, project_pk: int, worker_pk: int) -> HttpResponse:
+    project, role = _get_project_membership(request.user, project_pk)
+    if role not in ("admin", "owner"):
+        raise PermissionDenied
+    target = get_object_or_404(ProjectMembership, project=project, worker_id=worker_pk)
+    position_id = request.POST.get("position") or None
+    if position_id:
+        position = get_object_or_404(Position, pk=position_id, project=project)
+        target.position = position
+    else:
+        target.position = None
+    target.save(update_fields=["position"])
+    return redirect("main:project-members", project_pk=project_pk)
+
+
+@login_required
+@require_POST
 def project_leave_view(request: HttpRequest, project_pk: int) -> HttpResponse:
     project, role = _get_project_membership(request.user, project_pk)
     if role is None:
@@ -374,7 +448,7 @@ class PositionListView(ProjectMemberRequiredMixin, generic.ListView):
     paginate_by = 13
 
     def get_queryset(self) -> QuerySet:
-        return Position.objects.filter(project=self.project).prefetch_related("workers")
+        return Position.objects.filter(project=self.project).prefetch_related("memberships")
 
 
 class PositionCreateView(ProjectAdminRequiredMixin, generic.CreateView):
@@ -477,13 +551,11 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
         return context
 
     def get_queryset(self) -> QuerySet:
-        queryset = Worker.objects.select_related("position").prefetch_related("tasks")
+        queryset = Worker.objects.prefetch_related("tasks")
         form = WorkerSearchForm(self.request.GET)
         if form.is_valid():
             search_term = form.cleaned_data["username_or_position_name"]
-            return queryset.filter(
-                Q(username__icontains=search_term) | Q(position__name__icontains=search_term)
-            )
+            return queryset.filter(Q(username__icontains=search_term))
         return queryset
 
 
@@ -496,7 +568,7 @@ class ProjectWorkerListView(ProjectMemberRequiredMixin, generic.ListView):
         return (
             ProjectMembership.objects
             .filter(project=self.project)
-            .select_related("worker", "worker__position")
+            .select_related("worker", "position")
             .order_by("role", "worker__username")
         )
 
@@ -511,6 +583,9 @@ def worker_detail_view(request: HttpRequest, pk: int) -> HttpResponse:
         "assigned_tasks_count": assigned_tasks.count(),
         "completed_tasks_count": assigned_tasks.filter(is_completed=True).count(),
         "today": now(),
+        "is_own_profile": request.user.pk == worker.pk,
+        "projects_created_count": Project.objects.filter(owner=worker).count(),
+        "projects_member_count": ProjectMembership.objects.filter(worker=worker).count(),
     }
     return render(request, "main/worker_detail.html", context=context)
 
@@ -527,7 +602,7 @@ class AdminWorkerCreateView(AdminRequiredMixin, generic.CreateView):
     form_class = AdminWorkerCreationForm
 
 
-class WorkerUpdateView(SelfOrAdminMixin, generic.UpdateView):
+class WorkerUpdateView(SelfOnlyMixin, generic.UpdateView):
     model = Worker
     success_url = reverse_lazy("main:worker-list")
     form_class = WorkerPositionUpdateForm

@@ -22,7 +22,6 @@
       <tr>
         <th class="px-4">Member</th>
         <th>Position</th>
-        <th>Role</th>
         <th>Joined</th>
         {% if user_is_project_admin %}<th class="text-end pe-4">Actions</th>{% endif %}
       </tr>
@@ -47,14 +46,21 @@
             </div>
           </div>
         </td>
-        <td class="text-muted small">{{ membership.worker.position|default:"—" }}</td>
         <td>
-          <span class="badge
-            {% if membership.role == 'owner' %}bg-primary
-            {% elif membership.role == 'admin' %}bg-success
-            {% else %}bg-secondary{% endif %}">
-            {{ membership.get_role_display }}
-          </span>
+          {% if user_is_project_admin %}
+          <form method="post" action="{% url 'main:project-set-position' project_pk=project.pk worker_pk=membership.worker.pk %}">
+            {% csrf_token %}
+            <select name="position" class="form-select form-select-sm" style="width:auto;min-width:130px;"
+                    onchange="this.form.submit()" title="Set position">
+              <option value="">— No position —</option>
+              {% for pos in positions %}
+              <option value="{{ pos.pk }}" {% if membership.position_id == pos.pk %}selected{% endif %}>{{ pos.name }}</option>
+              {% endfor %}
+            </select>
+          </form>
+          {% else %}
+          <span class="text-muted small">{{ membership.position.name|default:"—" }}</span>
+          {% endif %}
         </td>
         <td class="text-muted small">{{ membership.joined_at|date:"M d, Y" }}</td>
         {% if user_is_project_admin %}

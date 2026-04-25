@@ -26,18 +26,12 @@
             {{ membership.worker.username }}{% if user.id == membership.worker.id %} <span class="text-muted fw-normal small">(me)</span>{% endif %}
           </a>
           <div class="worker-card-position">
-            {% if membership.worker.first_name or membership.worker.last_name %}{{ membership.worker.first_name }} {{ membership.worker.last_name }} &middot; {% endif %}{{ membership.worker.position.name|default:"No position" }}
+            {% if membership.worker.first_name or membership.worker.last_name %}{{ membership.worker.first_name }} {{ membership.worker.last_name }}{% if membership.position %} &middot; {% endif %}{% endif %}{{ membership.position.name|default:"" }}
           </div>
         </div>
       </div>
       <div class="worker-card-footer">
         <div class="d-flex align-items-center gap-2">
-          <span class="badge
-            {% if membership.role == 'owner' %}bg-primary
-            {% elif membership.role == 'admin' %}bg-success
-            {% else %}bg-secondary{% endif %}">
-            {{ membership.get_role_display }}
-          </span>
           <span class="badge" style="background:var(--brand-soft);color:var(--brand);font-size:.67rem;">
             <i class="bi bi-list-task me-1"></i>{{ membership.worker.tasks.count }} tasks
           </span>

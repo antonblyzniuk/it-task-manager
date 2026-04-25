@@ -7,24 +7,23 @@
       <i class="bi bi-arrow-left me-1"></i> Back
     </a>
     <h1 class="page-title">Invite to {{ project.name }}</h1>
-    <p class="text-muted small mb-0">Share this key so others can join the project</p>
+    <p class="text-muted small mb-0">Share a key so others can join the project</p>
   </div>
 </div>
 
-<div class="row g-4 justify-content-center">
-  <div class="col-lg-7" data-aos="fade-up">
-    <div class="form-card">
-      <h5 class="fw-bold mb-3"><i class="bi bi-key-fill me-2" style="color:var(--brand)"></i>Secret Key</h5>
-      <p class="text-muted small mb-3">
-        Anyone with this key can join your project as a member.
-        Keep it private and regenerate it if you suspect it has been compromised.
-      </p>
+<div class="row g-4">
+
+  <!-- Multi-use project key -->
+  <div class="col-lg-6" data-aos="fade-up">
+    <div class="card shadow-sm p-4 h-100">
+      <h5 class="fw-bold mb-1"><i class="bi bi-key-fill me-2" style="color:var(--brand)"></i>Shared Key</h5>
+      <p class="text-muted small mb-3">Anyone with this key can join as a member. Works unlimited times.</p>
 
       <div class="d-flex align-items-center gap-2 mb-4">
         <code id="secretKey"
               class="flex-grow-1 p-3 rounded"
               style="background:var(--main-bg);border:1px solid var(--border-color);
-                     font-size:.85rem;word-break:break-all;letter-spacing:.05em;">
+                     font-size:.8rem;word-break:break-all;letter-spacing:.04em;">
           {{ project.secret_key }}
         </code>
         <button class="btn btn-outline-primary btn-sm" onclick="copyKey()" title="Copy key">
@@ -34,15 +33,93 @@
 
       {% if user_is_project_owner %}
       <form method="post" action="{% url 'main:project-regen-key' project_pk=project.pk %}"
-            onsubmit="return confirm('Regenerate the secret key? The old key will stop working immediately.');">
+            onsubmit="return confirm('Regenerate the shared key? The old key will stop working immediately.');">
         {% csrf_token %}
         <button type="submit" class="btn btn-outline-warning btn-sm">
-          <i class="bi bi-arrow-clockwise me-1"></i> Regenerate Key
+          <i class="bi bi-arrow-clockwise me-1"></i> Regenerate
         </button>
       </form>
       {% endif %}
     </div>
   </div>
+
+  <!-- One-time invite key generator -->
+  <div class="col-lg-6" data-aos="fade-up" data-aos-delay="60">
+    <div class="card shadow-sm p-4 h-100">
+      <h5 class="fw-bold mb-1"><i class="bi bi-person-plus-fill me-2" style="color:#10b981"></i>One-Time Invite</h5>
+      <p class="text-muted small mb-3">Generate a single-use key that auto-assigns a position. Deleted after use.</p>
+
+      <form method="post" action="{% url 'main:project-invite-one-time-create' project_pk=project.pk %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Position (optional)</label>
+          <select name="position" class="form-select form-select-sm">
+            <option value="">— No position —</option>
+            {% for pos in positions %}
+            <option value="{{ pos.pk }}">{{ pos.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-sm btn-outline-success">
+          <i class="bi bi-plus-lg me-1"></i> Generate Key
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pending one-time invites -->
+  {% if one_time_invites %}
+  <div class="col-12" data-aos="fade-up" data-aos-delay="100">
+    <div class="card shadow-sm">
+      <div class="card-header border-bottom py-3 px-4">
+        <h5 class="fw-bold mb-0"><i class="bi bi-hourglass-split me-2 text-muted"></i>Pending One-Time Keys</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th class="px-4">Key</th>
+              <th>Position</th>
+              <th>Created by</th>
+              <th>Created</th>
+              <th class="text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invite in one_time_invites %}
+            <tr>
+              <td class="px-4">
+                <div class="d-flex align-items-center gap-2">
+                  <code class="small" style="word-break:break-all;color:var(--brand);"
+                        id="ot-key-{{ invite.pk }}">{{ invite.key }}</code>
+                  <button class="btn btn-outline-secondary btn-sm py-0 px-1"
+                          onclick="copyOtKey('{{ invite.pk }}')" title="Copy">
+                    <i class="bi bi-clipboard" id="ot-icon-{{ invite.pk }}"></i>
+                  </button>
+                </div>
+              </td>
+              <td class="text-muted small">{{ invite.position.name|default:"—" }}</td>
+              <td class="text-muted small">{{ invite.created_by.username }}</td>
+              <td class="text-muted small">{{ invite.created_at|date:"M d, Y H:i" }}</td>
+              <td class="text-end pe-4">
+                <form method="post"
+                      action="{% url 'main:project-invite-one-time-revoke' project_pk=project.pk invite_pk=invite.pk %}"
+                      onsubmit="return confirm('Revoke this one-time key?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Revoke">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 
@@ -52,6 +129,14 @@ function copyKey() {
   var key = document.getElementById('secretKey').textContent.trim();
   navigator.clipboard.writeText(key).then(function() {
     var icon = document.getElementById('copyIcon');
+    icon.className = 'bi bi-clipboard-check';
+    setTimeout(function() { icon.className = 'bi bi-clipboard'; }, 2000);
+  });
+}
+function copyOtKey(pk) {
+  var key = document.getElementById('ot-key-' + pk).textContent.trim();
+  navigator.clipboard.writeText(key).then(function() {
+    var icon = document.getElementById('ot-icon-' + pk);
     icon.className = 'bi bi-clipboard-check';
     setTimeout(function() { icon.className = 'bi bi-clipboard'; }, 2000);
   });

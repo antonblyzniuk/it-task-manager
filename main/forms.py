@@ -29,10 +29,15 @@ class JoinProjectForm(forms.Form):
 
 
 class WorkerCreationForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email address"}),
+    )
+
     class Meta:
         model = Worker
         fields = UserCreationForm.Meta.fields + (
-            "position",
+            "email",
             "first_name",
             "last_name",
         )
@@ -55,7 +60,7 @@ class AdminWorkerCreationForm(WorkerCreationForm):
 class WorkerPositionUpdateForm(forms.ModelForm):
     class Meta:
         model = Worker
-        fields = ["username", "first_name", "last_name", "position"]
+        fields = ["username", "first_name", "last_name"]
 
 
 class WorkerSearchForm(forms.Form):
@@ -63,7 +68,7 @@ class WorkerSearchForm(forms.Form):
         max_length=255,
         required=False,
         label="",
-        widget=forms.TextInput(attrs={"placeholder": "Search by username or position..."})
+        widget=forms.TextInput(attrs={"placeholder": "Search by username..."})
     )
 
 

@@ -8,9 +8,12 @@ project_urlpatterns = [
     path("delete/", views.ProjectDeleteView.as_view(), name="project-delete"),
     path("invite/", views.project_invite_view, name="project-invite"),
     path("invite/regenerate/", views.project_regenerate_key_view, name="project-regen-key"),
+    path("invite/one-time/create/", views.project_create_one_time_invite_view, name="project-invite-one-time-create"),
+    path("invite/one-time/<int:invite_pk>/revoke/", views.project_revoke_one_time_invite_view, name="project-invite-one-time-revoke"),
     path("members/", views.project_members_view, name="project-members"),
     path("members/<int:worker_pk>/remove/", views.project_remove_member_view, name="project-remove-member"),
     path("members/<int:worker_pk>/set-role/", views.project_set_member_role_view, name="project-set-role"),
+    path("members/<int:worker_pk>/set-position/", views.project_set_member_position_view, name="project-set-position"),
     path("leave/", views.project_leave_view, name="project-leave"),
 
     # Tasks

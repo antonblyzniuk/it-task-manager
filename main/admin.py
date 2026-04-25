@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
-from main.models import Position, Project, ProjectMembership, Task, TaskType, Worker
+from main.models import OneTimeInvite, Position, Project, ProjectMembership, Task, TaskType, Worker
 
 
 @admin.register(TaskType)
@@ -21,12 +21,12 @@ class PositionAdmin(admin.ModelAdmin):
 
 @admin.register(Worker)
 class WorkerAdmin(UserAdmin):
-    list_display = UserAdmin.list_display + ("position", "role")
+    list_display = UserAdmin.list_display + ("role",)
     fieldsets = UserAdmin.fieldsets + (
-        ("Additional Info", {"fields": ("position", "role")}),
+        ("Additional Info", {"fields": ("role",)}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ("Additional Info", {"fields": ("first_name", "last_name", "position", "role")}),
+        ("Additional Info", {"fields": ("first_name", "last_name", "role")}),
     )
 
 
@@ -47,9 +47,15 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(ProjectMembership)
 class ProjectMembershipAdmin(admin.ModelAdmin):
-    list_display = ["worker", "project", "role", "joined_at"]
+    list_display = ["worker", "project", "role", "position", "joined_at"]
     list_filter = ["role", "project"]
     search_fields = ["worker__username", "project__name"]
+
+
+@admin.register(OneTimeInvite)
+class OneTimeInviteAdmin(admin.ModelAdmin):
+    list_display = ["project", "position", "created_by", "created_at"]
+    list_filter = ["project"]
 
 
 admin.site.unregister(Group)

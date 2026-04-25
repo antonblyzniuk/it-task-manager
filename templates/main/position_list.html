@@ -31,7 +31,7 @@
         <td class="text-muted small">{{ position.id }}</td>
         <td class="fw-semibold">{{ position.name }}</td>
         <td>
-          <span class="badge" style="background:var(--brand-soft);color:var(--brand);">{{ position.workers.count }}</span>
+          <span class="badge" style="background:var(--brand-soft);color:var(--brand);">{{ position.memberships.count }}</span>
         </td>
         <td class="text-muted small">{{ position.created_at|date:"M d, Y" }}</td>
         {% if user_is_project_admin %}

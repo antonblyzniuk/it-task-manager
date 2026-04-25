@@ -8,7 +8,7 @@
     <div class="card shadow-sm p-4">
       <div class="row align-items-center g-3">
         <div class="col-auto">
-          <div class="worker-avatar-lg" style="width:64px;height:64px;font-size:1.25rem;
+          <div class="worker-avatar-lg" style="width:72px;height:72px;font-size:1.75rem;
                background:linear-gradient(135deg,var(--brand),#8b5cf6);border-radius:50%;
                display:flex;align-items:center;justify-content:center;color:#fff;
                font-weight:700;box-shadow:0 4px 16px rgba(99,102,241,0.4);">
@@ -16,18 +16,24 @@
           </div>
         </div>
         <div class="col">
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <h2 class="mb-0 fw-bold" style="font-size:1.35rem;">
-              {{ worker.first_name }} {{ worker.last_name }}
-            </h2>
-            <span class="role-badge role-{{ worker.role }}">{{ worker.get_role_display }}</span>
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+            <h2 class="mb-0 fw-bold" style="font-size:1.5rem;">@{{ worker.username }}</h2>
           </div>
-          <p class="text-muted mb-0 small mt-1">{{ worker.position }}</p>
+          {% if worker.first_name or worker.last_name %}
+          <p class="text-muted mb-0" style="font-size:.95rem;">{{ worker.first_name }} {{ worker.last_name }}</p>
+          {% endif %}
         </div>
-        <div class="col-auto d-flex gap-2">
-          <a href="{% url 'main:worker-update' pk=worker.id %}" class="btn btn-sm btn-outline-primary">
+        <div class="col-auto d-flex gap-2 flex-wrap">
+          {% if not is_own_profile and worker.email %}
+          <a href="mailto:{{ worker.email }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-envelope me-1"></i>Send Email
+          </a>
+          {% endif %}
+          {% if is_own_profile %}
+          <a href="{% url 'main:worker-update' pk=worker.id %}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-pencil me-1"></i>Edit
           </a>
+          {% endif %}
           {% if request.user.is_admin %}
           <a href="{% url 'main:worker-delete' pk=worker.id %}" class="btn btn-sm btn-outline-danger">
             <i class="bi bi-trash3 me-1"></i>Delete
@@ -39,10 +45,6 @@
       <hr style="border-color:var(--border-color);">
 
       <div class="row g-3">
-        <div class="col-sm-6 col-md-3">
-          <span class="meta-label">Username</span>
-          <span class="meta-value">{{ worker.username }}</span>
-        </div>
         <div class="col-sm-6 col-md-3">
           <span class="meta-label">Email</span>
           <span class="meta-value">{{ worker.email|default:"—" }}</span>
@@ -62,14 +64,28 @@
 
 <!-- Stats -->
 <div class="row g-3 mb-4">
-  <div class="col-md-6" data-aos="fade-up" data-aos-delay="60">
+  <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="40">
     <div class="stat-card stat-primary card-hover text-center">
-      <div class="stat-icon primary mx-auto mb-2"><i class="bi bi-list-task"></i></div>
+      <div class="stat-icon primary mx-auto mb-2"><i class="bi bi-folder-plus"></i></div>
+      <h5 class="fw-bold mb-0 counter" data-count="{{ projects_created_count }}">{{ projects_created_count }}</h5>
+      <div class="text-muted small mt-1">Projects Created</div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="80">
+    <div class="stat-card stat-info card-hover text-center">
+      <div class="stat-icon info mx-auto mb-2"><i class="bi bi-people-fill"></i></div>
+      <h5 class="fw-bold mb-0 counter" data-count="{{ projects_member_count }}">{{ projects_member_count }}</h5>
+      <div class="text-muted small mt-1">Projects Member Of</div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="120">
+    <div class="stat-card stat-warning card-hover text-center">
+      <div class="stat-icon warning mx-auto mb-2"><i class="bi bi-list-task"></i></div>
       <h5 class="fw-bold mb-0 counter" data-count="{{ assigned_tasks_count }}">{{ assigned_tasks_count }}</h5>
       <div class="text-muted small mt-1">Assigned Tasks</div>
     </div>
   </div>
-  <div class="col-md-6" data-aos="fade-up" data-aos-delay="120">
+  <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="160">
     <div class="stat-card stat-success card-hover text-center">
       <div class="stat-icon success mx-auto mb-2"><i class="bi bi-check-circle-fill"></i></div>
       <h5 class="fw-bold mb-0 counter" data-count="{{ completed_tasks_count }}">{{ completed_tasks_count }}</h5>

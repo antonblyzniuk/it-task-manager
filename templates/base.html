@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-bs-theme',t);}());</script>
+    <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);}());</script>
     <meta charset="UTF-8">
     <title>IT Task Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -149,7 +149,6 @@
         <div class="user-avatar">{{ user.username|first|upper }}</div>
         <div class="overflow-hidden">
           <div class="user-name">{{ user.username }}</div>
-          <div class="user-role">{{ user.get_role_display }}</div>
         </div>
       </div>
       <button onclick="toggleTheme()" class="sidebar-action-btn">

@@ -37,11 +37,6 @@
               <span class="small text-muted">by {{ membership.project.owner.username }}</span>
             </div>
           </div>
-          <span class="badge
-            {% if membership.role == 'owner' %}bg-primary
-            {% elif membership.role == 'admin' %}bg-success
-            {% else %}bg-secondary{% endif %}
-            ">{{ membership.get_role_display }}</span>
         </div>
 
         {% if membership.project.description %}

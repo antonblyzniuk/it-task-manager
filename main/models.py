@@ -65,6 +65,13 @@ class ProjectMembership(models.Model):
         choices=Role.choices,
         default=Role.MEMBER,
     )
+    position = models.ForeignKey(
+        "Position",
+        on_delete=models.SET_NULL,
+        related_name="memberships",
+        null=True,
+        blank=True,
+    )
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -125,13 +132,6 @@ class Worker(AbstractUser):
         MANAGER = "manager", "Manager"
         DEVELOPER = "developer", "Developer"
 
-    position = models.ForeignKey(
-        Position,
-        on_delete=models.SET_NULL,
-        related_name="workers",
-        null=True,
-        blank=True,
-    )
     role = models.CharField(
         max_length=10,
         choices=Role.choices,
@@ -144,7 +144,7 @@ class Worker(AbstractUser):
         verbose_name_plural = "Workers"
 
     def __str__(self) -> str:
-        return f"{self.username} ({self.position})"
+        return self.username
 
     def get_absolute_url(self):
         return reverse("main:worker-detail", args=[str(self.id)])
@@ -156,6 +156,35 @@ class Worker(AbstractUser):
     @property
     def is_manager(self) -> bool:
         return self.role == self.Role.MANAGER or self.is_admin
+
+
+class OneTimeInvite(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="one_time_invites",
+    )
+    key = models.CharField(max_length=64, unique=True)
+    position = models.ForeignKey(
+        Position,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="one_time_invites",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="created_invites",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @staticmethod
+    def generate_key() -> str:
+        return secrets.token_urlsafe(32)
 
 
 class Task(models.Model):

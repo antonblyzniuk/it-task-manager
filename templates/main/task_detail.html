@@ -135,7 +135,6 @@
                 {{ worker.username }}{% if user.id == worker.id %} <span class="text-muted">(you)</span>{% endif %}
               </a>
             </div>
-            <div class="small text-muted">{{ worker.position|default:"No position" }}</div>
           </div>
         </div>
         {% if user_is_project_admin or user.id == worker.id %}
