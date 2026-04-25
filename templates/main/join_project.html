@@ -6,11 +6,10 @@
   <div class="form-page-inner" data-aos="fade-up">
     <div class="form-page-header">
       <div class="form-page-icon">
-        <i class="bi bi-{% if form.instance.pk %}pencil-square{% else %}plus-circle-fill{% endif %}"></i>
+        <i class="bi bi-key-fill"></i>
       </div>
-      <h2 class="form-page-title">
-        {% if form.instance.pk %}Update{% else %}Create{% endif %} Task
-      </h2>
+      <h2 class="form-page-title">Join a Project</h2>
+      <p class="text-muted small mt-1">Enter the secret key shared by the project owner.</p>
     </div>
 
     <form method="post" novalidate>
@@ -21,12 +20,11 @@
         </div>
       {% endfor %}
       <div class="form-page-actions">
-        <a href="{% url 'main:task-list' project_pk=project.pk %}" class="btn btn-outline-secondary rounded-pill px-4">
+        <a href="{% url 'main:project-list' %}" class="btn btn-outline-secondary rounded-pill px-4">
           <i class="bi bi-arrow-left me-1"></i> Cancel
         </a>
         <button type="submit" class="btn btn-gradient-primary rounded-pill px-4">
-          <i class="bi bi-check-circle me-1"></i>
-          {% if form.instance.pk %}Update{% else %}Create{% endif %}
+          <i class="bi bi-box-arrow-in-right me-1"></i> Join
         </button>
       </div>
     </form>

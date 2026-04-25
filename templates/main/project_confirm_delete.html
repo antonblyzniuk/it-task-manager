@@ -6,18 +6,22 @@
     <div class="delete-icon-ring">
       <i class="bi bi-exclamation-triangle-fill"></i>
     </div>
-    <h2 class="fw-bold mb-2" style="font-size:1.35rem;letter-spacing:-0.02em;">Delete Task?</h2>
+    <h2 class="fw-bold mb-2" style="font-size:1.35rem;letter-spacing:-0.02em;">Delete Project?</h2>
     <p class="text-muted mb-1">You're about to permanently delete:</p>
     <p class="fw-semibold mb-1" style="font-size:1.05rem;">"{{ object.name }}"</p>
-    <p class="text-muted small mb-4">This action cannot be undone.</p>
+    <p class="text-muted small mb-4">
+      All tasks, positions, and task types in this project will be deleted.<br>
+      This action cannot be undone.
+    </p>
 
     <form method="post" class="d-grid mb-2">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger btn-lg rounded-pill">
-        <i class="bi bi-trash3-fill me-2"></i>Yes, Delete
+        <i class="bi bi-trash3-fill me-2"></i>Yes, Delete Project
       </button>
     </form>
-    <a href="{% url 'main:task-list' project_pk=project.pk %}" class="btn btn-outline-secondary btn-lg rounded-pill w-100">
+    <a href="{% url 'main:project-detail' project_pk=object.pk %}"
+       class="btn btn-outline-secondary btn-lg rounded-pill w-100">
       Cancel
     </a>
   </div>

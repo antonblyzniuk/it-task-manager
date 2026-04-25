@@ -9,7 +9,7 @@
     <h2 class="fw-bold mb-2" style="font-size:1.35rem;letter-spacing:-0.02em;">Delete Position?</h2>
     <p class="text-muted mb-1">You're about to delete the position:</p>
     <p class="fw-semibold mb-1" style="font-size:1.05rem;">"{{ object.name }}"</p>
-    <p class="text-muted small mb-4">Workers assigned to this position will also be removed.</p>
+    <p class="text-muted small mb-4">Workers assigned to this position will have it cleared.</p>
 
     <form method="post" class="d-grid mb-2">
       {% csrf_token %}
@@ -17,7 +17,7 @@
         <i class="bi bi-trash3-fill me-2"></i>Yes, Delete
       </button>
     </form>
-    <a href="{% url 'main:position-list' %}" class="btn btn-outline-secondary btn-lg rounded-pill w-100">
+    <a href="{% url 'main:position-list' project_pk=project.pk %}" class="btn btn-outline-secondary btn-lg rounded-pill w-100">
       Cancel
     </a>
   </div>

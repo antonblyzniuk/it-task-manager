@@ -9,8 +9,8 @@
       {{ tasks_todo.count }} to do &middot; {{ tasks_overdue.count }} overdue &middot; {{ tasks_done.count }} done
     </p>
   </div>
-  {% if request.user.is_manager %}
-  <a href="{% url 'main:task-create' %}" class="btn btn-gradient-primary">
+  {% if user_is_project_admin %}
+  <a href="{% url 'main:task-create' project_pk=project.pk %}" class="btn btn-gradient-primary">
     <i class="bi bi-plus-lg me-1"></i> New Task
   </a>
   {% endif %}
@@ -43,7 +43,7 @@
       <button type="submit" class="btn btn-primary btn-sm w-100">
         <i class="bi bi-search"></i>
       </button>
-      <a href="{% url 'main:task-list' %}" class="btn btn-outline-secondary btn-sm">
+      <a href="{% url 'main:task-list' project_pk=project.pk %}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-x-lg"></i>
       </a>
     </div>
@@ -62,7 +62,7 @@
     </div>
     <div class="kanban-cards">
       {% for task in tasks_todo %}
-      <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}">
+      <a href="{% url 'main:task-detail' project_pk=project.pk pk=task.id %}" class="task-card priority-{{ task.priority }}">
         <div class="task-card-title">{{ task.name }}</div>
         <div class="task-card-meta">
           <span class="badge bg-light text-dark border" style="font-size:.66rem;">{{ task.task_type.name }}</span>
@@ -78,8 +78,8 @@
         <span class="empty-state-icon"><i class="bi bi-inbox"></i></span>
         <h5>Nothing to do</h5>
         <p>All clear — or try adjusting your filters.</p>
-        {% if request.user.is_manager %}
-        <a href="{% url 'main:task-create' %}" class="btn btn-sm btn-primary">+ New Task</a>
+        {% if user_is_project_admin %}
+        <a href="{% url 'main:task-create' project_pk=project.pk %}" class="btn btn-sm btn-primary">+ New Task</a>
         {% endif %}
       </div>
       {% endfor %}
@@ -95,7 +95,7 @@
     </div>
     <div class="kanban-cards">
       {% for task in tasks_overdue %}
-      <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}">
+      <a href="{% url 'main:task-detail' project_pk=project.pk pk=task.id %}" class="task-card priority-{{ task.priority }}">
         <div class="task-card-title">{{ task.name }}</div>
         <div class="task-card-meta">
           <span class="badge bg-light text-dark border" style="font-size:.66rem;">{{ task.task_type.name }}</span>
@@ -125,7 +125,7 @@
     </div>
     <div class="kanban-cards">
       {% for task in tasks_done %}
-      <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }} opacity-75">
+      <a href="{% url 'main:task-detail' project_pk=project.pk pk=task.id %}" class="task-card priority-{{ task.priority }} opacity-75">
         <div class="task-card-title text-decoration-line-through text-muted">{{ task.name }}</div>
         <div class="task-card-meta">
           <span class="badge bg-light text-dark border" style="font-size:.66rem;">{{ task.task_type.name }}</span>

@@ -5,9 +5,9 @@
 <div class="page-header" data-aos="fade-up">
   <div>
     <h1 class="page-title"><i class="bi bi-person-check-fill me-2" style="color:var(--brand)"></i>My Tasks</h1>
-    <p class="text-muted small mb-0">Tasks assigned to you</p>
+    <p class="text-muted small mb-0">Tasks assigned to you in {{ project.name }}</p>
   </div>
-  <a href="{% url 'main:task-list' %}" class="btn btn-outline-secondary btn-sm">
+  <a href="{% url 'main:task-list' project_pk=project.pk %}" class="btn btn-outline-secondary btn-sm">
     <i class="bi bi-grid-3x3-gap me-1"></i> All Tasks
   </a>
 </div>
@@ -15,7 +15,7 @@
 {% if task_list %}
 <div class="d-flex flex-column gap-2">
   {% for task in task_list %}
-  <a href="{% url 'main:task-detail' pk=task.id %}" class="task-card priority-{{ task.priority }}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0 }}0">
+  <a href="{% url 'main:task-detail' project_pk=project.pk pk=task.id %}" class="task-card priority-{{ task.priority }}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}0">
     <div class="d-flex align-items-start justify-content-between gap-3">
       <div class="flex-grow-1 overflow-hidden">
         <div class="task-card-title {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
@@ -53,7 +53,7 @@
   <span class="empty-state-icon"><i class="bi bi-person-check"></i></span>
   <h5>No tasks assigned to you yet</h5>
   <p>
-    Browse <a href="{% url 'main:task-list' %}" style="color:var(--brand)">all tasks</a> and click
+    Browse <a href="{% url 'main:task-list' project_pk=project.pk %}" style="color:var(--brand)">all tasks</a> and click
     <strong>Assign Me</strong> on any task to get started.
   </p>
 </div>

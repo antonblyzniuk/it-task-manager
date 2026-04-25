@@ -22,7 +22,7 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <a href="{% url 'main:index' %}" class="sidebar-brand">
+      <a href="{% url 'main:project-list' %}" class="sidebar-brand">
         <div class="sidebar-brand-icon">
           <i class="bi bi-kanban-fill"></i>
         </div>
@@ -30,55 +30,111 @@
       </a>
     </div>
     <nav class="sidebar-nav">
-      <div class="nav-section-label">Main</div>
+
+      {% if project %}
+      <!-- Project-specific navigation -->
+      <div class="nav-section-label">
+        <i class="bi bi-folder-fill me-1" style="color:var(--brand)"></i>
+        {{ project.name|truncatechars:20 }}
+      </div>
       <ul class="nav flex-column">
         <li class="nav-item">
-          <a class="sidebar-link {% if request.path == '/' %}active{% endif %}"
-             href="{% url 'main:index' %}">
+          <a class="sidebar-link {% if request.path == '/projects/'|add:project.pk|stringformat:'d'|add:'/' %}active{% endif %}"
+             href="{% url 'main:project-detail' project_pk=project.pk %}">
             <i class="bi bi-house-fill"></i> Dashboard
           </a>
         </li>
         <li class="nav-item">
-          <a class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"
-             href="{% url 'main:about' %}">
-            <i class="bi bi-info-circle-fill"></i>
-            <span>About</span>
-          </a>
-        </li>
-        <li class="nav-item">
           <a class="sidebar-link {% if '/tasks/' in request.path and '/tasks/my/' not in request.path %}active{% endif %}"
-             href="{% url 'main:task-list' %}">
+             href="{% url 'main:task-list' project_pk=project.pk %}">
             <i class="bi bi-kanban"></i> All Tasks
           </a>
         </li>
         <li class="nav-item">
           <a class="sidebar-link {% if '/tasks/my/' in request.path %}active{% endif %}"
-             href="{% url 'main:my-tasks' %}">
+             href="{% url 'main:my-tasks' project_pk=project.pk %}">
             <i class="bi bi-person-check-fill"></i> My Tasks
           </a>
         </li>
-      </ul>
-      <div class="nav-section-label mt-2">Manage</div>
-      <ul class="nav flex-column">
         <li class="nav-item">
           <a class="sidebar-link {% if '/workers/' in request.path %}active{% endif %}"
-             href="{% url 'main:worker-list' %}">
-            <i class="bi bi-people-fill"></i> Workers
+             href="{% url 'main:project-worker-list' project_pk=project.pk %}">
+            <i class="bi bi-people-fill"></i> Team
           </a>
         </li>
         <li class="nav-item">
           <a class="sidebar-link {% if '/positions/' in request.path %}active{% endif %}"
-             href="{% url 'main:position-list' %}">
+             href="{% url 'main:position-list' project_pk=project.pk %}">
             <i class="bi bi-diagram-3-fill"></i> Positions
           </a>
         </li>
         <li class="nav-item">
           <a class="sidebar-link {% if '/task-types/' in request.path %}active{% endif %}"
-             href="{% url 'main:task-type-list' %}">
+             href="{% url 'main:task-type-list' project_pk=project.pk %}">
             <i class="bi bi-tags-fill"></i> Task Types
           </a>
         </li>
+        {% if user_is_project_admin %}
+        <li class="nav-item">
+          <a class="sidebar-link {% if '/members/' in request.path %}active{% endif %}"
+             href="{% url 'main:project-members' project_pk=project.pk %}">
+            <i class="bi bi-person-gear"></i> Members
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="sidebar-link {% if '/invite/' in request.path %}active{% endif %}"
+             href="{% url 'main:project-invite' project_pk=project.pk %}">
+            <i class="bi bi-key-fill"></i> Invite Key
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="sidebar-link {% if '/settings/' in request.path %}active{% endif %}"
+             href="{% url 'main:project-settings' project_pk=project.pk %}">
+            <i class="bi bi-gear-fill"></i> Settings
+          </a>
+        </li>
+        {% endif %}
       </ul>
+      <div class="nav-section-label mt-2">Projects</div>
+      {% else %}
+      <div class="nav-section-label">Navigation</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="sidebar-link {% if request.path == '/projects/' %}active{% endif %}"
+             href="{% url 'main:project-list' %}">
+            <i class="bi bi-grid-fill"></i> My Projects
+          </a>
+        </li>
+      </ul>
+      <div class="nav-section-label mt-2">Projects</div>
+      {% endif %}
+
+      <ul class="nav flex-column">
+        {% for membership in user_memberships %}
+        <li class="nav-item">
+          <a class="sidebar-link {% if project.pk == membership.project.pk %}active fw-semibold{% endif %}"
+             href="{% url 'main:project-detail' project_pk=membership.project.pk %}">
+            <i class="bi bi-folder{% if project.pk == membership.project.pk %}-fill{% endif %}"></i>
+            <span class="text-truncate" style="max-width:130px;display:inline-block;">{{ membership.project.name }}</span>
+          </a>
+        </li>
+        {% empty %}
+        <li class="nav-item px-2 py-1">
+          <span class="text-muted small">No projects yet</span>
+        </li>
+        {% endfor %}
+        <li class="nav-item mt-1">
+          <a class="sidebar-link" href="{% url 'main:project-create' %}">
+            <i class="bi bi-plus-circle"></i> New Project
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="sidebar-link" href="{% url 'main:project-join' %}">
+            <i class="bi bi-box-arrow-in-right"></i> Join Project
+          </a>
+        </li>
+      </ul>
+
       <div class="nav-section-label mt-2">Account</div>
       <ul class="nav flex-column">
         <li class="nav-item">
@@ -114,11 +170,23 @@
       <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
         <i class="bi bi-list fs-4"></i>
       </button>
-      <span class="fw-bold small" style="color:var(--brand);">IT Task Manager</span>
+      <span class="fw-bold small" style="color:var(--brand);">
+        {% if project %}{{ project.name|truncatechars:18 }}{% else %}IT Task Manager{% endif %}
+      </span>
       <a href="{{ request.user.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
         <i class="bi bi-person-circle"></i>
       </a>
     </header>
+    {% if messages %}
+    <div class="px-4 pt-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
     <main class="main-content">
 {% else %}
 <div class="app-layout">

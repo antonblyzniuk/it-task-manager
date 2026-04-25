@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header" data-aos="fade-up">
+  <div>
+    <h1 class="page-title"><i class="bi bi-people-fill me-2" style="color:var(--brand)"></i>Team</h1>
+    <p class="text-muted small mb-0">{{ project.name }} &middot; {{ memberships.paginator.count }} member{{ memberships.paginator.count|pluralize }}</p>
+  </div>
+  {% if user_is_project_admin %}
+  <a href="{% url 'main:project-invite' project_pk=project.pk %}" class="btn btn-gradient-primary btn-sm">
+    <i class="bi bi-person-plus me-1"></i> Invite
+  </a>
+  {% endif %}
+</div>
+
+{% if memberships %}
+<div class="row g-3">
+  {% for membership in memberships %}
+  <div class="col-sm-6 col-xl-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}0">
+    <div class="worker-card">
+      <div class="worker-card-top">
+        <div class="worker-avatar-lg">{{ membership.worker.username|first|upper }}</div>
+        <div class="overflow-hidden">
+          <a href="{% url 'main:worker-detail' pk=membership.worker.id %}" class="worker-card-name">
+            {{ membership.worker.username }}{% if user.id == membership.worker.id %} <span class="text-muted fw-normal small">(me)</span>{% endif %}
+          </a>
+          <div class="worker-card-position">
+            {% if membership.worker.first_name or membership.worker.last_name %}{{ membership.worker.first_name }} {{ membership.worker.last_name }} &middot; {% endif %}{{ membership.worker.position.name|default:"No position" }}
+          </div>
+        </div>
+      </div>
+      <div class="worker-card-footer">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge
+            {% if membership.role == 'owner' %}bg-primary
+            {% elif membership.role == 'admin' %}bg-success
+            {% else %}bg-secondary{% endif %}">
+            {{ membership.get_role_display }}
+          </span>
+          <span class="badge" style="background:var(--brand-soft);color:var(--brand);font-size:.67rem;">
+            <i class="bi bi-list-task me-1"></i>{{ membership.worker.tasks.count }} tasks
+          </span>
+        </div>
+        {% if user_is_project_admin and membership.role != 'owner' and membership.worker != request.user %}
+        <form method="post"
+              action="{% url 'main:project-remove-member' project_pk=project.pk worker_pk=membership.worker.pk %}"
+              onsubmit="return confirm('Remove {{ membership.worker.username }} from this project?');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove from project">
+            <i class="bi bi-person-x"></i>
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state py-5" data-aos="fade-up">
+  <span class="empty-state-icon"><i class="bi bi-people"></i></span>
+  <h5>No members yet</h5>
+  <p>Share the invite key to add people to this project.</p>
+</div>
+{% endif %}
+
+<div class="mt-4">
+  {% include "includes/pagination.html" %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header" data-aos="fade-up">
+  <div>
+    <a href="{% url 'main:project-detail' project_pk=project.pk %}" class="btn btn-sm btn-outline-secondary mb-2">
+      <i class="bi bi-arrow-left me-1"></i> Back
+    </a>
+    <h1 class="page-title"><i class="bi bi-person-gear me-2" style="color:var(--brand)"></i>Members</h1>
+    <p class="text-muted small mb-0">{{ project.name }} &middot; {{ memberships.count }} member{{ memberships.count|pluralize }}</p>
+  </div>
+  {% if user_is_project_admin %}
+  <a href="{% url 'main:project-invite' project_pk=project.pk %}" class="btn btn-gradient-primary btn-sm">
+    <i class="bi bi-key me-1"></i> Invite Key
+  </a>
+  {% endif %}
+</div>
+
+<div class="data-table" data-aos="fade-up" data-aos-delay="60">
+  <table class="table table-hover align-middle mb-0 w-100">
+    <thead>
+      <tr>
+        <th class="px-4">Member</th>
+        <th>Position</th>
+        <th>Role</th>
+        <th>Joined</th>
+        {% if user_is_project_admin %}<th class="text-end pe-4">Actions</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for membership in memberships %}
+      <tr>
+        <td class="px-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="user-avatar" style="width:32px;height:32px;font-size:.75rem;flex-shrink:0;">
+              {{ membership.worker.username|first|upper }}
+            </div>
+            <div>
+              <a href="{% url 'main:worker-detail' pk=membership.worker.pk %}"
+                 class="text-decoration-none fw-semibold" style="color:var(--text-primary);">
+                {{ membership.worker.username }}
+                {% if membership.worker == request.user %}<span class="text-muted fw-normal small">(you)</span>{% endif %}
+              </a>
+              {% if membership.worker.first_name or membership.worker.last_name %}
+              <div class="text-muted small">{{ membership.worker.first_name }} {{ membership.worker.last_name }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td class="text-muted small">{{ membership.worker.position|default:"—" }}</td>
+        <td>
+          <span class="badge
+            {% if membership.role == 'owner' %}bg-primary
+            {% elif membership.role == 'admin' %}bg-success
+            {% else %}bg-secondary{% endif %}">
+            {{ membership.get_role_display }}
+          </span>
+        </td>
+        <td class="text-muted small">{{ membership.joined_at|date:"M d, Y" }}</td>
+        {% if user_is_project_admin %}
+        <td class="text-end pe-4">
+          <div class="d-flex gap-1 justify-content-end">
+            {% if user_is_project_owner and membership.role != 'owner' %}
+            <form method="post" action="{% url 'main:project-set-role' project_pk=project.pk worker_pk=membership.worker.pk %}">
+              {% csrf_token %}
+              <select name="role" class="form-select form-select-sm" style="width:auto;"
+                      onchange="this.form.submit()" title="Change role">
+                <option value="member" {% if membership.role == 'member' %}selected{% endif %}>Member</option>
+                <option value="admin" {% if membership.role == 'admin' %}selected{% endif %}>Admin</option>
+              </select>
+            </form>
+            {% endif %}
+            {% if membership.role != 'owner' and membership.worker != request.user %}
+              {% if user_is_project_owner or membership.role == 'member' %}
+              <form method="post"
+                    action="{% url 'main:project-remove-member' project_pk=project.pk worker_pk=membership.worker.pk %}"
+                    onsubmit="return confirm('Remove {{ membership.worker.username }} from the project?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove">
+                  <i class="bi bi-person-x"></i>
+                </button>
+              </form>
+              {% endif %}
+            {% endif %}
+          </div>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

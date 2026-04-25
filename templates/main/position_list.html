@@ -7,8 +7,8 @@
     <h1 class="page-title"><i class="bi bi-diagram-3-fill me-2" style="color:var(--brand)"></i>Positions</h1>
     <p class="text-muted small mb-0">Organize workers by their team role</p>
   </div>
-  {% if request.user.is_admin %}
-  <a href="{% url 'main:position-create' %}" class="btn btn-gradient-primary btn-sm">
+  {% if user_is_project_admin %}
+  <a href="{% url 'main:position-create' project_pk=project.pk %}" class="btn btn-gradient-primary btn-sm">
     <i class="bi bi-plus-lg me-1"></i> Add Position
   </a>
   {% endif %}
@@ -22,7 +22,7 @@
         <th>Position Name</th>
         <th>Workers</th>
         <th>Created</th>
-        {% if request.user.is_admin %}<th class="text-end pe-4">Actions</th>{% endif %}
+        {% if user_is_project_admin %}<th class="text-end pe-4">Actions</th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -34,12 +34,12 @@
           <span class="badge" style="background:var(--brand-soft);color:var(--brand);">{{ position.workers.count }}</span>
         </td>
         <td class="text-muted small">{{ position.created_at|date:"M d, Y" }}</td>
-        {% if request.user.is_admin %}
+        {% if user_is_project_admin %}
         <td class="text-end pe-4">
-          <a href="{% url 'main:position-update' pk=position.id %}" class="btn btn-sm btn-outline-secondary me-1">
+          <a href="{% url 'main:position-update' project_pk=project.pk pk=position.id %}" class="btn btn-sm btn-outline-secondary me-1">
             <i class="bi bi-pencil"></i>
           </a>
-          <a href="{% url 'main:position-delete' pk=position.id %}" class="btn btn-sm btn-outline-danger">
+          <a href="{% url 'main:position-delete' project_pk=project.pk pk=position.id %}" class="btn btn-sm btn-outline-danger">
             <i class="bi bi-trash3"></i>
           </a>
         </td>
@@ -52,8 +52,8 @@
             <span class="empty-state-icon"><i class="bi bi-diagram-3"></i></span>
             <h5>No positions yet</h5>
             <p>Positions help organize workers by their role in the team.</p>
-            {% if request.user.is_admin %}
-            <a href="{% url 'main:position-create' %}" class="btn btn-sm btn-primary">+ Add Position</a>
+            {% if user_is_project_admin %}
+            <a href="{% url 'main:position-create' project_pk=project.pk %}" class="btn btn-sm btn-primary">+ Add Position</a>
             {% endif %}
           </div>
         </td>
