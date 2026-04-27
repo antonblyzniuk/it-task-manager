@@ -21,9 +21,8 @@ class ModelsStrTest(TestCase):
             password="test_password",
             first_name="test_first_name",
             last_name="test_last_name",
-            position=Position(name="test_position")
         )
-        self.assertEqual(str(worker), f"{worker.username} ({worker.position})")
+        self.assertEqual(str(worker), worker.username)
 
     def test_task_str(self):
         task = Task(
@@ -52,7 +51,7 @@ class ModelsGetAbsoluteUrlTest(TestCase):
         expected_url = reverse("main:worker-detail", args=[str(worker.id)])
         self.assertEqual(worker.get_absolute_url(), expected_url)
 
-    def test_get_absolute_url_task(self):
+    def test_get_absolute_url_task_without_project(self):
         task_type = TaskType.objects.create(name="test_task_type")
 
         task = Task.objects.create(
@@ -60,7 +59,6 @@ class ModelsGetAbsoluteUrlTest(TestCase):
             description="test_task_description",
             deadline=now(),
             priority=Task.Priority.HIGH,
-            task_type=task_type
+            task_type=task_type,
         )
-        expected_url = reverse("main:task-detail", args=[str(task.id)])
-        self.assertEqual(task.get_absolute_url(), expected_url)
+        self.assertEqual(task.get_absolute_url(), "/")

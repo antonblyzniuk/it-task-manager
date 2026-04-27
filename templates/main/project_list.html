@@ -54,7 +54,7 @@
            class="btn btn-sm btn-gradient-primary flex-grow-1">
           <i class="bi bi-arrow-right-circle me-1"></i> Open
         </a>
-        {% if membership.role in 'admin owner' %}
+        {% if membership.role == 'admin' or membership.role == 'owner' %}
         <a href="{% url 'main:project-settings' project_pk=membership.project.pk %}"
            class="btn btn-sm btn-outline-secondary" title="Settings">
           <i class="bi bi-gear"></i>

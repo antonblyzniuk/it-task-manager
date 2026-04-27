@@ -34,12 +34,12 @@ You can try the live demo here: https://it-task-manager-nws5.onrender.com/
 **🖥️ Frontend:**
 - Django Templates
 - Crispy Forms
-- Bootstrap 4
+- Bootstrap 5
 
 **🗄️ Backend:**
 - Python 3.12+
 - Django 5.2.1
-- SQLite (default) or PostgreSQL for production
+- PostgreSQL
 
 **🛠️ Tools & Others:**
 - black, ruff – Code formatting and linting
@@ -68,9 +68,12 @@ pip install -r requirements.txt
 ```
 
 ### 4. Set up environment variables
-Create a .env file in the root directory:
+Create a `.env` file in the root directory:
 ```bash
 SECRET_KEY=your-secret-key
+DATABASE_URL=postgres://user:password@localhost:5432/dbname
+ADMIN_SECRET_CODE=your-admin-secret   # optional, enables /admin-register/
+DEBUG=True
 ```
 
 ### 5. Apply migrations
@@ -82,10 +85,6 @@ python manage.py migrate
 ```bash
 python manage.py runserver
 ```
-**🧪 Test user credentials**
-> also works in production
-- login: test_user
-- password: test_test123
 
 ## 🏞️ UI Preview
 

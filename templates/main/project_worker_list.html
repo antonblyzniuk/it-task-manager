@@ -36,7 +36,7 @@
             <i class="bi bi-list-task me-1"></i>{{ membership.worker.tasks.count }} tasks
           </span>
         </div>
-        {% if user_is_project_admin and membership.role != 'owner' and membership.worker != request.user %}
+        {% if user_is_project_admin and membership.role != 'owner' and membership.worker != request.user and (user_is_project_owner or membership.role != 'admin') %}
         <form method="post"
               action="{% url 'main:project-remove-member' project_pk=project.pk worker_pk=membership.worker.pk %}"
               onsubmit="return confirm('Remove {{ membership.worker.username }} from this project?');">

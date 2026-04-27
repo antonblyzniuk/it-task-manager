@@ -213,11 +213,11 @@
       </div>
       <div class="card-body p-3">
         <div class="d-flex flex-column gap-2">
+          {% if user_is_project_admin %}
           <a href="{% url 'main:task-create' project_pk=project.pk %}"
              class="btn btn-gradient-primary btn-sm w-100 mb-1">
             <i class="bi bi-plus-lg me-1"></i> New Task
           </a>
-          {% if user_is_project_admin %}
           <a href="{% url 'main:project-members' project_pk=project.pk %}"
              class="btn btn-outline-secondary btn-sm w-100">
             <i class="bi bi-person-gear me-1"></i> Manage Members
